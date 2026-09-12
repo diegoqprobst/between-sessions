@@ -21,7 +21,7 @@
         <div class="sky-orb orb-one"></div><div class="sky-orb orb-two"></div>
         <div id="companion" class="companion calm" aria-label="Nubo está tranquilo">
           <div class="companion-halo"></div><div class="companion-ear ear-left"></div><div class="companion-ear ear-right"></div>
-          <div class="companion-head"><i class="eye eye-left"></i><i class="eye eye-right"></i><i class="blush blush-left"></i><i class="blush blush-right"></i><i class="mouth"></i></div>
+          <div class="companion-head"><i class="eye eye-left"></i><i class="eye eye-right"></i><i class="under-eye under-eye-left"></i><i class="under-eye under-eye-right"></i><i class="blush blush-left"></i><i class="blush blush-right"></i><i class="mouth"></i></div>
           <div class="companion-arm arm-left"></div><div class="companion-arm arm-right"></div><div class="companion-body"><i class="belly"></i><i class="belly-heart">♥</i></div>
         </div>
         <div class="stage-ground"></div><span class="companion-name">Nubo</span>
@@ -35,6 +35,11 @@
         <div class="progress-track" role="progressbar" aria-label="Progreso del paseo" aria-valuemin="0" aria-valuemax="10" aria-valuenow="0"><span id="progress-fill"></span></div>
         <div class="quest-actions"><button id="accept-quest" class="primary" type="button">Voy a intentarlo</button><button id="choose-another" class="secondary" type="button">Otro reto</button></div>
       </section>
+      <section class="care-card" aria-labelledby="care-title">
+        <div class="quest-heading"><div><span class="section-kicker">RITUALES DE HOY</span><h2 id="care-title">Pequeños cuidados</h2></div><span id="care-count" class="quest-count">0 / 3</span></div>
+        <div class="care-progress" role="progressbar" aria-label="Rituales registrados hoy" aria-valuemin="0" aria-valuemax="3" aria-valuenow="0"><span id="care-fill"></span></div>
+        <div class="care-actions"><button class="care-action" type="button" data-care="agua">💧<span>Tomé agua</span></button><button class="care-action" type="button" data-care="movimiento">☀️<span>Me moví</span></button><button class="care-action" type="button" data-care="conexión">♡<span>Conecté</span></button></div>
+      </section>
       <section class="signal-row" aria-label="Señales conectadas">
         <div><span class="signal-icon">☾</span><span><small>Sueño</small><strong>6 h 20</strong></span></div>
         <div><span class="signal-icon">↗</span><span><small>Movimiento</small><strong>2,840 pasos</strong></span></div>
@@ -45,7 +50,7 @@
         <div><strong id="voice-title">Habla con Nubo</strong><p id="voice-copy">Mantén pulsado para contarle cómo vas.</p></div>
         <button id="text-button" class="text-button" type="button">Texto</button>
       </section>
-      <p class="wellness-note">Bienestar general, no diagnóstico ni servicio de emergencia. Tú eliges qué conectas y qué compartes.</p>
+      <p class="wellness-note">Bienestar general, no diagnóstico ni servicio de emergencia. Tú eliges qué conectas y qué compartes; tu empleador no ve tu información individual.</p>
       <nav class="bottom-nav" aria-label="Navegación">
         <button class="nav-item active" type="button">Hoy</button><button class="nav-item" type="button">Recorrido</button><button class="nav-item" type="button">Control</button>
       </nav>

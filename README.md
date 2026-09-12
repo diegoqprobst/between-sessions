@@ -36,6 +36,7 @@ Slack Socket Mode (`server/slack_app.py`) ── private DMs only ──▶ same
 | **OpenAI** | Agents SDK for the check-in and brief agents (GPT-5.4 mini) | `server/agent/`, `server/llm.py` |
 | **Google** | Cloud Run hosts the server; Gemini is a supported provider via its OpenAI-compatible endpoint | `deploy.sh`, `server/llm.py` |
 | **OpenRouter** | Optional routing with a per-request privacy policy (`provider.data_collection: "deny"`, optional `zdr`) plus Llama Guard 4 as a dedicated guardrail. Present key wins; model ids are normalized per provider | `server/llm.py`, `server/guard.py` |
+| **Ambiguous AI** | The clinician's side lives in their workspace. The agent is provisioned as a real coworker with its own identity and address (`between@…`), and it delivers the approved brief as a document it authored, plus a task to review it before the session. Email delivery stays the fallback | `server/workspace.py` |
 | **Exa** | `sugerir` searches public-health sources (WHO, NIH, CDC, APA, NHS) so a worker without a clinician can pick a weekly focus, each option cited | `server/research.py` |
 | **Auth0** | Asynchronous authorization (CIBA) as the stronger form of the same approval gate: a push to the worker's phone instead of a chat reply. Implemented and wired; **not exercised in this demo**, which uses the in-chat approval — see Honest status | `server/auth/ciba.py`, `server/app.py` (`/brief`) |
 | **Trigger.dev** | 3-hourly signal evaluation, waitpoint tokens that pause a run until the patient replies, nightly brief | `orchestrator/src/trigger/` |
@@ -68,7 +69,7 @@ Every endpoint has a fixture: `fixtures/health_sample.json`, `fixtures/plan_ejem
 
 ## Honest status
 
-What was exercised end to end on build day, in a real Slack workspace against local models: onboarding, Apple Watch signal ingestion, the trigger rules, a real check-in fired by a short night, `sugerir` with live Exa results, brief generation, the approval request, and delivery.
+What was exercised end to end on build day, in a real Slack workspace against local models: onboarding, Apple Watch signal ingestion, the trigger rules, a real check-in fired by a short night, `sugerir` with live Exa results, brief generation, the approval request, and delivery by email and as a document in the clinician's Ambiguous AI workspace, authored by the agent's own provisioned identity.
 
 Written and tested by unit tests but **not exercised live**: Auth0 CIBA (needs a tenant with the CIBA grant and Guardian enrolled, so the demo uses the in-chat approval instead), Trigger.dev scheduling (the check-in was fired directly against the endpoint), and the WhatsApp channel (the code path is shared with Slack and its command parsing is tested, but the Twilio Sandbox was not used on the day).
 

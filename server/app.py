@@ -4,7 +4,7 @@ from fastapi import FastAPI, Request, Header, HTTPException, Response
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from server import config, store, decide, guard, trigger_client
-from server import channels, research, mail
+from server import channels, research, mail, workspace
 from server.api import router as api_router
 from server.channels import twilio as wa
 from server.signals import health as health_signals
@@ -145,6 +145,16 @@ async def handle_inbound(sender: str, body: str) -> str | None:
 def _deliver_brief(p: dict, content: str, bid: int) -> str:
     to = p.get("therapist_email") or config.THERAPIST_EMAIL
     ok = mail.send(to, f"[Between Sessions] Brief previo a sesión — {p.get('name')}", content)
+    plan = store.latest_plan(p["id"])
+    # Extra: el mismo brief como documento firmado por el agente en el espacio del clínico.
+    # El correo manda; esto no puede tumbar la entrega.
+    try:
+        result = workspace.deliver_brief(p.get("name") or "paciente", content,
+                                         (plan or {}).get("next_session_date"))
+        if result.get("enabled"):
+            print(f"[workspace] documento={result.get('document')} tarea={result.get('task')}")
+    except Exception as e:
+        print(f"[workspace] no se pudo publicar: {e}")
     store.set_brief(bid, approved=1, sent=int(ok))
     channels.send(p["phone"], "Enviado a tu terapeuta. Gracias por esta semana.")
     return "sent"

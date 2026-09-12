@@ -2,6 +2,7 @@ from datetime import datetime, timezone
 from fastapi import FastAPI, Request, Header, HTTPException, Response
 from pydantic import BaseModel
 from server import config, store, decide, guard, trigger_client
+from server import channels
 from server.channels import twilio as wa
 from server.signals import health as health_signals
 from server.agent import checkin as checkin_agent
@@ -54,12 +55,14 @@ async def twilio_webhook(request: Request, x_twilio_signature: str | None = Head
     sender, body = form.get("From", ""), form.get("Body", "")
     reply = await handle_inbound(sender, body)
     if reply:
-        wa.send(sender, reply)
+        store.add_message(store.get_or_create_patient(sender)["id"], "out", reply)
+        channels.send(sender, reply)
     return Response(content="<Response/>", media_type="application/xml")
 
-WELCOME = ("Hola, soy tu acompañante entre sesiones. Te escribiré solo cuando tu reloj o tu plan lo justifiquen, "
-           "y tu terapeuta recibirá un resumen antes de cada sesión únicamente si tú lo apruebas.\n"
-           "Comandos: 'pausa', 'reanudar', 'borrar', 'no compartas sueño'.\n¿Cómo te llamas?")
+WELCOME = ("Hola, soy tu acompañante entre sesiones. Soy tuyo, no de tu empresa: te escribiré solo cuando tu reloj o tu plan "
+           "lo justifiquen, y tu terapeuta o coach recibirá un resumen únicamente si tú lo apruebas.\n"
+           "Comandos: 'pausa', 'reanudar', 'borrar', 'no compartas sueño', y 'plan: dormir 7h; cortar a las 6 | tarea: caminar 20 min' "
+           "si quieres ponerte tu propio plan.\n¿Cómo te llamas?")
 
 async def handle_inbound(sender: str, body: str) -> str | None:
     p = store.get_or_create_patient(sender)
@@ -76,6 +79,14 @@ async def handle_inbound(sender: str, body: str) -> str | None:
             store.set_patient(pid, paused=0); return "Reanudado. Aquí sigo."
         if kind == "delete":
             store.delete_patient_data(pid); return "Borré tus señales, conversaciones y resúmenes. Tu plan queda."
+        if kind == "plan":
+            if not p["ref"]:
+                return "Primero dime cómo te llamas y luego me pasas tu plan."
+            sp = wa.parse_self_plan(arg)
+            store.add_plan(pid, {"session_date": date.today().isoformat(),
+                                 "next_session_date": (date.today() + timedelta(days=7)).isoformat(),
+                                 "watch": sp["watch"], "homework": sp["homework"], "next_focus": "Revisar la semana"})
+            return f"Plan guardado. Esta semana vigilamos: {', '.join(sp['watch'])}." + (f" Tarea: {sp['homework']}." if sp['homework'] else "")
         excluded = list(p["excluded_signals"] or []) + [arg]
         store.set_patient(pid, excluded_signals=excluded); return f"De acuerdo: '{arg}' no irá en el resumen."
 
@@ -84,7 +95,7 @@ async def handle_inbound(sender: str, body: str) -> str | None:
     if p["stage"] == "ask_name":
         name = text.split()[0].strip(".,!").title() if text else "Paciente"
         store.set_patient(pid, stage="active", name=name, ref=name.lower())
-        return f"Gracias, {name}. Cuando tu terapeuta cargue el plan de la sesión, empiezo a acompañarte."
+        return f"Gracias, {name}. Cuando tu terapeuta cargue el plan de la sesión, o me escribas 'plan: ...', empiezo a acompañarte."
 
     if p.get("awaiting_brief") and text.lower() in ("sí", "si", "ok", "dale", "yes", "apruebo"):
         return await _send_brief_after_approval(p)
@@ -117,7 +128,7 @@ def _deliver_brief(p: dict, content: str, bid: int) -> str:
     to = p.get("therapist_email") or config.THERAPIST_EMAIL
     ok = mail.send(to, f"[Between Sessions] Brief previo a sesión — {p.get('name')}", content)
     store.set_brief(bid, approved=1, sent=int(ok))
-    wa.send(p["phone"], "Enviado a tu terapeuta. Gracias por esta semana.")
+    channels.send(p["phone"], "Enviado a tu terapeuta. Gracias por esta semana.")
     return "sent"
 
 async def _send_brief_after_approval(p: dict) -> str | None:
@@ -151,7 +162,7 @@ def start_checkin(body: CheckinIn, x_therapist_key: str | None = Header(default=
     q = checkin_agent.open_question(p, store.latest_plan(p["id"]), body.trigger, sig[-1] if sig else None)
     store.set_patient(p["id"], pending_trigger=body.trigger, pending_token=body.waitpoint_token, turns=0)
     store.add_message(p["id"], "out", q)
-    wa.send(p["phone"], q)
+    channels.send(p["phone"], q)
     return {"sent": True, "question": q}
 
 class PlanIn(BaseModel):
@@ -204,6 +215,6 @@ def make_briefs(body: BriefIn, x_therapist_key: str | None = Header(default=None
                 results.append({"patient_id": p["id"], "status": "denied"})
         else:
             store.set_patient(p["id"], awaiting_brief=1)
-            wa.send(p["phone"], "Preparé el resumen de tu semana para tu terapeuta. ¿Lo envío? Responde 'sí' o 'no'.")
+            channels.send(p["phone"], "Preparé el resumen de tu semana para tu terapeuta. ¿Lo envío? Responde 'sí' o 'no'.")
             results.append({"patient_id": p["id"], "status": "awaiting_whatsapp"})
     return {"results": results}

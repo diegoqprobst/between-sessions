@@ -24,7 +24,7 @@ def valid_signature(url: str, params: dict, signature: str | None) -> bool:
         return True
     return RequestValidator(config.TWILIO_AUTH_TOKEN).validate(url, params, signature or "")
 
-_CMD = re.compile(r"^\s*(pausa|pause|reanudar|resume|borrar|delete|no compartas|don't share)\s*(.*)$", re.I)
+_CMD = re.compile(r"^\s*(pausa|pause|reanudar|resume|borrar|delete|no compartas|don't share|plan:|plan)\s*(.*)$", re.I)
 
 def parse_command(text: str) -> tuple[str, str] | None:
     """Devuelve ('pause'|'resume'|'delete'|'exclude', argumento) o None."""
@@ -38,4 +38,13 @@ def parse_command(text: str) -> tuple[str, str] | None:
         return ("resume", "")
     if word in ("borrar", "delete"):
         return ("delete", "")
+    if word.startswith("plan"):
+        return ("plan", arg.lstrip(":").strip()) if arg.strip(":").strip() else None
     return ("exclude", arg)
+
+def parse_self_plan(text: str) -> dict:
+    """'dormir 7h; cortar a las 6 | tarea: caminar 20 min' → watch + homework."""
+    watch_part, _, homework = text.partition("|")
+    homework = homework.split(":", 1)[-1].strip() if homework else ""
+    watch = [w.strip() for w in watch_part.split(";") if w.strip()]
+    return {"watch": watch, "homework": homework}

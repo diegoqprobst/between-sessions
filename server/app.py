@@ -4,11 +4,13 @@ from fastapi import FastAPI, Request, Header, HTTPException, Response
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from server import config, store, decide, guard, trigger_client
-from server import channels, research
+from server import channels, research, mail
 from server.api import router as api_router
 from server.channels import twilio as wa
 from server.signals import health as health_signals
 from server.agent import checkin as checkin_agent
+from server.agent import brief as brief_agent
+from server.auth import ciba
 
 app = FastAPI(title="Between Sessions")
 app.include_router(api_router)
@@ -156,7 +158,6 @@ async def _send_brief_after_approval(p: dict) -> str | None:
     return None  # _deliver_brief ya avisó por WhatsApp
 
 def _notify_therapist_risk(p: dict) -> None:
-    from server import mail
     to = p.get("therapist_email") or config.THERAPIST_EMAIL
     if to:
         mail.send(to, f"[Between Sessions] Señal de riesgo — {p.get('name')}",

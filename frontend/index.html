@@ -61,10 +61,17 @@
         <fieldset class="mood-picker"><legend>¿Cómo te sientes ahora?</legend><div><button type="button" data-mood="Bajo" aria-pressed="false">☁<span>Bajo</span></button><button type="button" data-mood="En calma" aria-pressed="false">◌<span>En calma</span></button><button type="button" data-mood="Con energía" aria-pressed="false">☀<span>Con energía</span></button></div></fieldset>
         <label class="journal-label" for="journal-note">Lo que quiero recordar hoy</label>
         <textarea id="journal-note" rows="6" placeholder="No tiene que ser perfecto. Puedes empezar por una cosa pequeña…"></textarea>
+        <div class="journal-media" aria-label="Añadir audio o imagen">
+          <button id="journal-record" class="media-button" type="button" aria-pressed="false">⌁ <span>Grabar audio</span></button>
+          <label class="media-button image-button" for="journal-image">▧ <span>Adjuntar imagen</span></label>
+          <input id="journal-image" type="file" accept="image/*" hidden />
+        </div>
+        <div id="audio-preview" class="media-preview" hidden><span>Audio privado listo</span><audio id="journal-audio" controls></audio></div>
+        <div id="image-preview" class="media-preview" hidden><img id="journal-image-preview" alt="Vista previa de imagen adjunta" /><button id="remove-image" type="button">Quitar</button></div>
         <label class="journal-label" for="journal-focus">Para mi próxima conversación, quiero explorar…</label>
         <input id="journal-focus" type="text" placeholder="Opcional" />
         <button id="save-journal" class="primary journal-save" type="button">Guardar solo para mí</button>
-        <p class="journal-footnote">Modo demo: permanece en esta pantalla y no se transmite a ningún servicio.</p>
+        <p class="journal-footnote">Modo demo: texto, audio e imagen permanecen en este navegador y no se transmiten a ningún servicio.</p>
         <article id="journal-entry" class="journal-entry" hidden><span class="section-kicker">GUARDADO AHORA</span><strong id="entry-mood"></strong><p id="entry-note"></p></article>
       </section>
     </main>

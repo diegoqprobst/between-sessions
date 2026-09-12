@@ -28,5 +28,31 @@ const showJournal = (show) => { journalSheet.hidden = !show; if (show) document.
 document.querySelector("#close-journal").addEventListener("click", () => showJournal(false));
 let selectedMood = "";
 document.querySelectorAll("[data-mood]").forEach((button) => button.addEventListener("click", () => { document.querySelectorAll("[data-mood]").forEach((item) => item.setAttribute("aria-pressed", "false")); button.setAttribute("aria-pressed", "true"); selectedMood = button.dataset.mood; }));
-document.querySelector("#save-journal").addEventListener("click", () => { const note = document.querySelector("#journal-note").value.trim(); if (!note) return notify("Escribe una línea para guardar tu entrada."); document.querySelector("#entry-mood").textContent = selectedMood ? `Ahora me siento: ${selectedMood}` : "Entrada privada"; document.querySelector("#entry-note").textContent = note; document.querySelector("#journal-entry").hidden = false; notify("Guardado en esta pantalla de demo. No se envió a nadie."); });
+let recorder; let recordedAudio; let imageUrl;
+const recordButton = document.querySelector("#journal-record");
+recordButton.addEventListener("click", async () => {
+  if (recorder?.state === "recording") { recorder.stop(); return; }
+  if (!navigator.mediaDevices?.getUserMedia || !window.MediaRecorder) return notify("Tu navegador no permite grabar audio aquí.");
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const chunks = [];
+    recorder = new MediaRecorder(stream);
+    recorder.ondataavailable = (event) => chunks.push(event.data);
+    recorder.onstop = () => {
+      recordedAudio = new Blob(chunks, { type: recorder.mimeType || "audio/webm" });
+      document.querySelector("#journal-audio").src = URL.createObjectURL(recordedAudio);
+      document.querySelector("#audio-preview").hidden = false;
+      recordButton.setAttribute("aria-pressed", "false"); recordButton.innerHTML = "⌁ <span>Grabar de nuevo</span>";
+      stream.getTracks().forEach((track) => track.stop());
+    };
+    recorder.start(); recordButton.setAttribute("aria-pressed", "true"); recordButton.innerHTML = "■ <span>Detener</span>";
+  } catch { notify("No se concedió acceso al micrófono. Puedes seguir escribiendo."); }
+});
+document.querySelector("#journal-image").addEventListener("change", (event) => {
+  const file = event.target.files?.[0]; if (!file) return;
+  if (imageUrl) URL.revokeObjectURL(imageUrl); imageUrl = URL.createObjectURL(file);
+  document.querySelector("#journal-image-preview").src = imageUrl; document.querySelector("#image-preview").hidden = false;
+});
+document.querySelector("#remove-image").addEventListener("click", () => { if (imageUrl) URL.revokeObjectURL(imageUrl); imageUrl = undefined; document.querySelector("#journal-image").value = ""; document.querySelector("#image-preview").hidden = true; });
+document.querySelector("#save-journal").addEventListener("click", () => { const note = document.querySelector("#journal-note").value.trim(); if (!note && !recordedAudio && !imageUrl) return notify("Escribe, graba o adjunta algo para guardar tu entrada."); document.querySelector("#entry-mood").textContent = selectedMood ? `Ahora me siento: ${selectedMood}` : "Entrada privada"; document.querySelector("#entry-note").textContent = note || "Entrada de audio o imagen adjunta."; document.querySelector("#journal-entry").hidden = false; notify("Guardado en esta pantalla de demo. No se envió a nadie."); });
 document.querySelectorAll(".nav-item").forEach((item) => item.addEventListener("click", () => { document.querySelectorAll(".nav-item").forEach((button) => button.classList.remove("active")); item.classList.add("active"); if (item.textContent === "Diario") return showJournal(true); if (item.textContent === "Hoy") return showJournal(false); notify(`${item.textContent}: próxima pantalla en construcción.`); }));

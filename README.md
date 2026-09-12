@@ -10,7 +10,7 @@ The agent that lives between therapy or coaching sessions. The session is docume
 
 - **Room → local.** Transcript and note never leave the Mac.
 - **Cloud ← plan only.** A JSON of what to watch and the homework. Never what the patient said. See [`bridge/quinde_plan.py`](bridge/quinde_plan.py).
-- **Pocket = consent.** The patient decides what is shared and approves every brief with a push on their phone (Auth0 CIBA). `pausa`, `borrar`, `no compartas sueño` work from the chat.
+- **Slack DM = consent.** The worker decides what is shared and approves every brief with a push on their phone (Auth0 CIBA). `pausa`, `borrar`, `no compartas sueño` work from the private DM. The employer sees nothing.
 - **The Watch decides when to talk.** Triggers: sleep drop vs. the 14-day median, HRV drop, negative logged mood, 48 h of silence, homework day. At most one check-in per 20 h, never 22:00–08:00. See [`server/decide.py`](server/decide.py).
 - **Room ← signal.** The therapist gets structure, not raw text. See [`server/agent/brief.py`](server/agent/brief.py).
 
@@ -19,12 +19,14 @@ Confidentiality *by control*, not by promise: who sees what is in the architectu
 ## Architecture
 
 ```
-Therapist's Mac (local)          Cloud Run (FastAPI, Python)            Trigger.dev (TypeScript)
-Quinde: audio → C-SOAP note      /plans   ← plan only                    evaluate-signals  cron */3h
+Clinician's Mac (local)          FastAPI (Python)                       Trigger.dev (TypeScript)
+Quinde: note → plan JSON         /plans   ← plan only                    evaluate-signals  cron */3h
 bridge/quinde_plan.py ──────────▶/health  ← Health Auto Export (Watch)    checkin           waitpoint 6h
-   any-llm on Ollama             /twilio  ← WhatsApp (Twilio Sandbox)     nightly-brief     cron 18:00
+   any-llm on Ollama             /twilio  ← WhatsApp (optional)           nightly-brief     cron 18:00
                                  /decide /checkin /brief  ← orchestrator
-                                 guard (moderation) · agents (OpenAI Agents SDK) · SQLite · Auth0 CIBA · mail
+                                 guard · agents · SQLite · Auth0 CIBA · mail
+
+Slack Socket Mode (`server/slack_app.py`) ── private DMs only ──▶ same FastAPI flow
 ```
 
 ## How we used each partner
@@ -32,7 +34,7 @@ bridge/quinde_plan.py ──────────▶/health  ← Health Auto 
 | Partner | What it does here | Where |
 |---|---|---|
 | **OpenAI** | Agents SDK for the check-in and brief agents (GPT-5.4 mini) | `server/agent/`, `server/llm.py` |
-| **OpenRouter** | Every model call carries a per-request privacy policy (`provider.data_collection: "deny"`, optional `zdr`), and hosts Llama Guard 4 as the fail-closed safety guardrail | `server/llm.py`, `server/guard.py` |
+| **OpenAI** | Direct model and moderation fallback for the demo; the guardrail fails closed if it cannot return a verdict | `server/llm.py`, `server/guard.py` |
 | **Auth0** | CIBA push approval on the patient's phone before anything reaches the therapist | `server/auth/ciba.py`, `server/app.py` (`/brief`) |
 | **Trigger.dev** | 3-hourly signal evaluation, waitpoint tokens that pause a run until the patient replies, nightly brief | `orchestrator/src/trigger/` |
 | **Mozilla.ai** | `any-llm` runs the local bridge on Ollama with the same call shape as the cloud | `bridge/quinde_plan.py` |
@@ -44,18 +46,17 @@ bridge/quinde_plan.py ──────────▶/health  ← Health Auto 
 ## Run it
 
 ```bash
-uv sync && cp .env.example .env            # fill OPENAI_API_KEY, Twilio, PUBLIC_URL (ngrok), THERAPIST_EMAIL
+uv sync && cp .env.example .env            # fill OPENAI_API_KEY, Slack and THERAPIST_EMAIL
 uv run pytest                              # rules, normalizer, commands
 uv run uvicorn server.app:app --port 8000  # terminal 1
-ngrok http --url=YOUR-DOMAIN.ngrok-free.app 8000   # terminal 2; set the Twilio Sandbox webhook to /twilio/webhook
 ```
 
-0. Slack: create the app from `slack-manifest.yaml`, install it, put `SLACK_BOT_TOKEN` (xoxb) and `SLACK_APP_TOKEN` (xapp) in `.env`, then `uv run python -m server.slack_app` (terminal 3).
+0. Slack: create the app from `slack-manifest.yaml`, enable Socket Mode, create its app-level token with `connections:write`, install it, put `SLACK_BOT_TOKEN` (`xoxb-`) and `SLACK_APP_TOKEN` (`xapp-`) in `.env`, then run `uv run python -m server.slack_app` (terminal 2). The manifest subscribes only to `message.im`; it does not read channels.
 1. The person DMs the bot `hola` (Slack) or texts the Sandbox number (WhatsApp), then their name. Optional self-plan: `plan: dormir 7h; cortar a las 6 | tarea: caminar 20 min`.
 2. Therapist publishes the plan from the local note: `uv run python bridge/quinde_plan.py fixtures/nota_quinde_ejemplo.json --next-session 2026-09-13` (or seed a synthetic week: `uv run python scripts/seed_week.py ana`).
 3. Apple Watch data arrives via Health Auto Export → `POST /health/{token}`.
-4. `cd orchestrator && npm i && npx trigger.dev@latest dev` and run `evaluate-signals` from the dashboard. The check-in lands on WhatsApp; the run waits up to 6 h for the reply.
-5. `nightly-brief` (or `POST /brief` with `{"patient_id":1,"force":true}`) drafts the brief, asks the patient for approval (Auth0 push, or a WhatsApp "sí" when Auth0 is not configured) and emails the therapist.
+4. `cd orchestrator && npm i && npx trigger.dev@latest dev` and run `evaluate-signals` from the dashboard. The check-in lands in the Slack DM; the run waits up to 6 h for the reply.
+5. `nightly-brief` (or `POST /brief` with `{"patient_id":1,"force":true}`) drafts the brief, asks the worker for approval (Auth0 push, or a Slack "sí" when Auth0 is not configured) and emails the clinician.
 
 Every endpoint has a fixture: `fixtures/health_sample.json`, `fixtures/plan_ejemplo.json`, `scripts/twilio_inbound.sh`.
 

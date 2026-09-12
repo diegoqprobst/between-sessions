@@ -12,10 +12,14 @@ def client() -> WebClient:
     return _client
 
 def send(to: str, body: str) -> str:
-    """to: 'slack:U0123'. Sin token, imprime (modo local)."""
+    """Send a DM to a Slack user. Without a token, print for the local demo."""
     user_id = to[len(PREFIX):] if to.startswith(PREFIX) else to
     if not config.SLACK_BOT_TOKEN:
         print(f"[slack] (sin token) → {user_id}: {body}")
         return "local"
-    res = client().chat_postMessage(channel=user_id, text=body)
+    # Scheduled check-ins happen outside an inbound event, so we cannot rely on
+    # Bolt's `say()` callback. Open (or retrieve) the one-to-one DM first.
+    dm = client().conversations_open(users=user_id)
+    channel_id = dm["channel"]["id"]
+    res = client().chat_postMessage(channel=channel_id, text=body)
     return res.get("ts", "")

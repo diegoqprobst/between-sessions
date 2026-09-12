@@ -17,3 +17,22 @@ def test_parse_self_plan():
     sp = parse_self_plan("dormir 7h; cortar a las 6 | tarea: caminar 20 min")
     assert sp == {"watch": ["dormir 7h", "cortar a las 6"], "homework": "caminar 20 min"}
     assert parse_self_plan("dormir 7h") == {"watch": ["dormir 7h"], "homework": ""}
+
+def test_slack_scheduled_message_opens_a_dm(monkeypatch):
+    class FakeSlack:
+        def __init__(self):
+            self.opened_for = None
+            self.posted_to = None
+        def conversations_open(self, *, users):
+            self.opened_for = users
+            return {"channel": {"id": "D123"}}
+        def chat_postMessage(self, *, channel, text):
+            self.posted_to = (channel, text)
+            return {"ts": "1.2"}
+
+    fake = FakeSlack()
+    monkeypatch.setattr(slack.config, "SLACK_BOT_TOKEN", "xoxb-test")
+    monkeypatch.setattr(slack, "client", lambda: fake)
+    assert slack.send("slack:U123", "¿Cómo vas?") == "1.2"
+    assert fake.opened_for == "U123"
+    assert fake.posted_to == ("D123", "¿Cómo vas?")

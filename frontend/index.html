@@ -9,7 +9,7 @@
   <body>
     <main class="phone-shell">
       <header class="app-header">
-        <button class="icon-button" type="button" aria-label="Abrir menú">☰</button>
+        <button class="icon-button menu-button" type="button" aria-label="Abrir menú">Menú</button>
         <div class="wordmark"><span class="wordmark-dot"></span>between</div>
         <button class="avatar-button" type="button" aria-label="Personalizar a Nubo">N</button>
       </header>
@@ -38,15 +38,15 @@
       <section class="care-card" aria-labelledby="care-title">
         <div class="quest-heading"><div><span class="section-kicker">RITUALES DE HOY</span><h2 id="care-title">Pequeños cuidados</h2></div><span id="care-count" class="quest-count">0 / 3</span></div>
         <div class="care-progress" role="progressbar" aria-label="Rituales registrados hoy" aria-valuemin="0" aria-valuemax="3" aria-valuenow="0"><span id="care-fill"></span></div>
-        <div class="care-actions"><button class="care-action" type="button" data-care="agua">💧<span>Tomé agua</span></button><button class="care-action" type="button" data-care="movimiento">☀️<span>Me moví</span></button><button class="care-action" type="button" data-care="conexión">♡<span>Conecté</span></button></div>
+        <div class="care-actions"><button class="care-action" type="button" data-care="agua"><span>Tomé agua</span></button><button class="care-action" type="button" data-care="movimiento"><span>Me moví</span></button><button class="care-action" type="button" data-care="conexión"><span>Conecté</span></button></div>
       </section>
       <section class="signal-row" aria-label="Señales conectadas">
-        <div><span class="signal-icon">☾</span><span><small>Sueño</small><strong>6 h 20</strong></span></div>
-        <div><span class="signal-icon">↗</span><span><small>Movimiento</small><strong>2,840 pasos</strong></span></div>
-        <div><span class="signal-icon">✦</span><span><small>Conexión</small><strong>Sin registrar</strong></span></div>
+        <div><span class="signal-icon">S</span><span><small>Sueño</small><strong>6 h 20</strong></span></div>
+        <div><span class="signal-icon">M</span><span><small>Movimiento</small><strong>2,840 pasos</strong></span></div>
+        <div><span class="signal-icon">C</span><span><small>Conexión</small><strong>Sin registrar</strong></span></div>
       </section>
       <section class="voice-dock" aria-label="Hablar con Nubo">
-        <button id="voice-button" class="voice-button" type="button" aria-pressed="false"><span>⌁</span></button>
+        <button id="voice-button" class="voice-button" type="button" aria-pressed="false"><span>Voz</span></button>
         <div><strong id="voice-title">Habla con Nubo</strong><p id="voice-copy">Mantén pulsado para contarle cómo vas.</p></div>
         <button id="text-button" class="text-button" type="button">Texto</button>
       </section>
@@ -55,15 +55,15 @@
         <button class="nav-item active" type="button">Hoy</button><button class="nav-item" type="button">Diario</button><button class="nav-item" type="button">Control</button>
       </nav>
       <section id="journal-sheet" class="journal-sheet" hidden aria-labelledby="journal-title">
-        <header class="journal-header"><button id="close-journal" class="icon-button" type="button" aria-label="Cerrar diario">←</button><span class="date-label">ESPACIO PRIVADO</span></header>
+        <header class="journal-header"><button id="close-journal" class="icon-button close-button" type="button" aria-label="Cerrar diario">Cerrar</button><span class="date-label">ESPACIO PRIVADO</span></header>
         <h2 id="journal-title">Tu diario</h2>
         <p class="journal-intro">Escribe sin presión. Este borrador no se envía a tu empleador ni a tu terapeuta.</p>
-        <fieldset class="mood-picker"><legend>¿Cómo te sientes ahora?</legend><div><button type="button" data-mood="Bajo" aria-pressed="false">☁<span>Bajo</span></button><button type="button" data-mood="En calma" aria-pressed="false">◌<span>En calma</span></button><button type="button" data-mood="Con energía" aria-pressed="false">☀<span>Con energía</span></button></div></fieldset>
+        <fieldset class="mood-picker"><legend>¿Cómo te sientes ahora?</legend><div><button class="mood-option low" type="button" data-mood="Bajo" aria-pressed="false"><i></i><span>Bajo</span></button><button class="mood-option calm" type="button" data-mood="En calma" aria-pressed="false"><i></i><span>En calma</span></button><button class="mood-option energy" type="button" data-mood="Con energía" aria-pressed="false"><i></i><span>Con energía</span></button></div></fieldset>
         <label class="journal-label" for="journal-note">Lo que quiero recordar hoy</label>
         <textarea id="journal-note" rows="6" placeholder="No tiene que ser perfecto. Puedes empezar por una cosa pequeña…"></textarea>
         <div class="journal-media" aria-label="Añadir audio o imagen">
-          <button id="journal-record" class="media-button" type="button" aria-pressed="false">⌁ <span>Grabar audio</span></button>
-          <label class="media-button image-button" for="journal-image">▧ <span>Adjuntar imagen</span></label>
+          <button id="journal-record" class="media-button" type="button" aria-pressed="false">Grabar audio</button>
+          <label class="media-button image-button" for="journal-image">Adjuntar imagen</label>
           <input id="journal-image" type="file" accept="image/*" hidden />
         </div>
         <div id="audio-preview" class="media-preview" hidden><span>Audio privado listo</span><audio id="journal-audio" controls></audio></div>

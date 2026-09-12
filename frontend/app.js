@@ -42,10 +42,10 @@ recordButton.addEventListener("click", async () => {
       recordedAudio = new Blob(chunks, { type: recorder.mimeType || "audio/webm" });
       document.querySelector("#journal-audio").src = URL.createObjectURL(recordedAudio);
       document.querySelector("#audio-preview").hidden = false;
-      recordButton.setAttribute("aria-pressed", "false"); recordButton.innerHTML = "⌁ <span>Grabar de nuevo</span>";
+      recordButton.setAttribute("aria-pressed", "false"); recordButton.textContent = "Grabar de nuevo";
       stream.getTracks().forEach((track) => track.stop());
     };
-    recorder.start(); recordButton.setAttribute("aria-pressed", "true"); recordButton.innerHTML = "■ <span>Detener</span>";
+    recorder.start(); recordButton.setAttribute("aria-pressed", "true"); recordButton.textContent = "Detener audio";
   } catch { notify("No se concedió acceso al micrófono. Puedes seguir escribiendo."); }
 });
 document.querySelector("#journal-image").addEventListener("change", (event) => {

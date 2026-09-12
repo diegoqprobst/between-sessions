@@ -49,14 +49,19 @@ INSTRUCTIONS = ("Del material dado, extrae 3 focos que una persona que trabaja e
                 "Uno por línea, sin numerar, máximo 8 palabras cada uno, en español, concretos y accionables "
                 "(ej. 'cortar el trabajo a una hora fija'). No diagnostiques ni des consejo clínico. Solo las 3 líneas.")
 
+def _system_prompt() -> str:
+    # Sin esto, un modelo local de razonamiento gasta todo el presupuesto de tokens
+    # pensando y devuelve contenido vacío.
+    return ("/no_think\n" + INSTRUCTIONS) if llm.is_local() else INSTRUCTIONS
+
 def suggest() -> str:
     if not enabled():
         return format_reply([], [])
     try:
         results = search()
         res = llm.sync_client().chat.completions.create(
-            model=llm.model_id(), max_tokens=200, temperature=0.3,
-            messages=[{"role": "system", "content": INSTRUCTIONS},
+            model=llm.model_id(), max_tokens=600, temperature=0.3,
+            messages=[{"role": "system", "content": _system_prompt()},
                       {"role": "user", "content": as_context(results)}],
             extra_body=llm.provider_policy())
         content = llm.strip_thinking(res.choices[0].message.content)

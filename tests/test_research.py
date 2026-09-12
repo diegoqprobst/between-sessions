@@ -22,3 +22,28 @@ def test_format_reply_without_focus_falls_back_to_self_plan():
 def test_format_reply_caps_at_four():
     msg = research.format_reply([f"foco {i}" for i in range(9)], [])
     assert "4. foco 3" in msg and "5. foco 4" not in msg
+
+
+def test_local_prompt_disables_thinking(monkeypatch):
+    """Un modelo local de razonamiento gastaba todo el presupuesto pensando y devolvía
+    contenido vacío, así que `sugerir` siempre caía al mensaje de reserva."""
+    from server import llm
+    monkeypatch.setattr(llm, "is_local", lambda: True)
+    assert research._system_prompt().startswith("/no_think")
+    monkeypatch.setattr(llm, "is_local", lambda: False)
+    assert not research._system_prompt().startswith("/no_think")
+
+def test_suggest_falls_back_when_model_returns_nothing(monkeypatch):
+    from server import llm
+    monkeypatch.setattr(research, "enabled", lambda: True)
+    monkeypatch.setattr(research, "search", lambda *a, **k: [{"url": "https://nih.gov/x", "title": "t", "text": ""}])
+    class Msg:  content = ""
+    class Choice: message = Msg()
+    class Res: choices = [Choice()]
+    class Chat:
+        class completions:
+            @staticmethod
+            def create(**kw): return Res()
+    class Client: chat = Chat()
+    monkeypatch.setattr(llm, "sync_client", lambda: Client())
+    assert "No pude traer sugerencias" in research.suggest()

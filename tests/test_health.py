@@ -10,10 +10,10 @@ def test_seven_days():
 
 def test_short_night_and_low_mood():
     by = {r["date"]: r for r in normalize(load())}
-    assert by["2026-09-10"]["sleep_h"] == 5.1
-    assert by["2026-09-10"]["hrv_ms"] == 36
-    assert by["2026-09-10"]["mood_valence"] == -0.6
-    assert by["2026-09-10"]["mood_labels"] == ["Anxious"]
+    assert by["2026-09-12"]["sleep_h"] == 5.1
+    assert by["2026-09-12"]["hrv_ms"] == 36
+    assert by["2026-09-12"]["mood_valence"] == -0.6
+    assert by["2026-09-12"]["mood_labels"] == ["Anxious"]
     assert by["2026-09-07"]["mood_valence"] is None
 
 def test_minutes_are_converted():

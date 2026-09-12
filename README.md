@@ -2,7 +2,7 @@
 
 **Mental health for remote workers, inside the tool they already live in.**
 
-The agent that lives between therapy or coaching sessions. The session is documented locally: audio, transcript and note never leave the clinician's Mac (via [quinde-clinica-local](https://github.com/diegoqprobst/quinde-clinica-local)). Only the structured *plan* goes to the cloud, or the worker sets their own plan from the chat. During the week, an agent in **Slack DMs** (WhatsApp as a second door) accompanies the person, guided by Apple Watch signals: it asks one question when sleep, HRV or a logged mood justifies it, not on a schedule. The night before the next session, the clinician receives a one-page brief the person approved with a push on their phone. The employer sees nothing, ever.
+The agent that lives between therapy or coaching sessions. The session is documented locally: audio, transcript and note never leave the clinician's Mac (via [quinde-clinica-local](https://github.com/diegoqprobst/quinde-clinica-local)). Only the structured *plan* goes to the cloud, or the worker sets their own plan from the chat. During the week, an agent in **Slack DMs** (WhatsApp as a second door) accompanies the person, guided by Apple Watch signals: it asks one question when sleep, HRV or a logged mood justifies it, not on a schedule. The night before the next session, the clinician receives a one-page brief, and only after the person approves it. The employer sees nothing, ever.
 
 > Built in one day at *Agents, Everywhere* (AI Tinkerers × OpenAI, Miami, Sept 12 2026). Every piece of data in this repo, the video and the post is synthetic. This tool *accompanies, records and summarizes for a clinician*. It does not detect or diagnose anything.
 
@@ -10,7 +10,7 @@ The agent that lives between therapy or coaching sessions. The session is docume
 
 - **Room → local.** Transcript and note never leave the Mac.
 - **Cloud ← plan only.** A JSON of what to watch and the homework. Never what the patient said. See [`bridge/quinde_plan.py`](bridge/quinde_plan.py).
-- **Slack DM = consent.** The worker decides what is shared and approves every brief with a push on their phone (Auth0 CIBA). `pausa`, `borrar`, `no compartas sueño` work from the private DM. The employer sees nothing.
+- **Slack DM = consent.** Nothing reaches the clinician until the worker approves that specific brief, in their own DM. `pausa`, `borrar`, `no compartas sueño` work from the same place. The employer sees nothing.
 - **The Watch decides when to talk.** Triggers: sleep drop vs. the 14-day median, HRV drop, negative logged mood, 48 h of silence, homework day. At most one check-in per 20 h, never 22:00–08:00. See [`server/decide.py`](server/decide.py).
 - **Room ← signal.** The therapist gets structure, not raw text. See [`server/agent/brief.py`](server/agent/brief.py).
 
@@ -37,7 +37,7 @@ Slack Socket Mode (`server/slack_app.py`) ── private DMs only ──▶ same
 | **Google** | Cloud Run hosts the server; Gemini is a supported provider via its OpenAI-compatible endpoint | `deploy.sh`, `server/llm.py` |
 | **OpenRouter** | Optional routing with a per-request privacy policy (`provider.data_collection: "deny"`, optional `zdr`) plus Llama Guard 4 as a dedicated guardrail. Present key wins; model ids are normalized per provider | `server/llm.py`, `server/guard.py` |
 | **Exa** | `sugerir` searches public-health sources (WHO, NIH, CDC, APA, NHS) so a worker without a clinician can pick a weekly focus, each option cited | `server/research.py` |
-| **Auth0** | CIBA push approval on the patient's phone before anything reaches the therapist | `server/auth/ciba.py`, `server/app.py` (`/brief`) |
+| **Auth0** | Asynchronous authorization (CIBA) as the stronger form of the same approval gate: a push to the worker's phone instead of a chat reply. Implemented and wired; **not exercised in this demo**, which uses the in-chat approval — see Honest status | `server/auth/ciba.py`, `server/app.py` (`/brief`) |
 | **Trigger.dev** | 3-hourly signal evaluation, waitpoint tokens that pause a run until the patient replies, nightly brief | `orchestrator/src/trigger/` |
 | **Mozilla.ai** | `any-llm` runs the local bridge on Ollama, so the clinical note is read on the therapist's own machine with the same call shape as the cloud | `bridge/quinde_plan.py` |
 | **Google Cloud Run** | Hosts the FastAPI server | `Dockerfile`, `deploy.sh` |
@@ -65,6 +65,14 @@ Every endpoint has a fixture: `fixtures/health_sample.json`, `fixtures/plan_ejem
 ## What the patient controls
 
 `pausa` / `reanudar` stop and resume everything. `borrar` deletes signals, conversations and briefs. `no compartas sueño` (or any signal) excludes it from the brief. Every brief needs an explicit approval; a denial sends the therapist only "the patient chose not to share this week".
+
+## Honest status
+
+What was exercised end to end on build day, in a real Slack workspace against local models: onboarding, Apple Watch signal ingestion, the trigger rules, a real check-in fired by a short night, `sugerir` with live Exa results, brief generation, the approval request, and delivery.
+
+Written and tested by unit tests but **not exercised live**: Auth0 CIBA (needs a tenant with the CIBA grant and Guardian enrolled, so the demo uses the in-chat approval instead), Trigger.dev scheduling (the check-in was fired directly against the endpoint), and the WhatsApp channel (the code path is shared with Slack and its command parsing is tested, but the Twilio Sandbox was not used on the day).
+
+We would rather say this than let a reader assume otherwise.
 
 ## Safety
 

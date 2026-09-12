@@ -3,80 +3,51 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Between Sessions</title>
+    <title>Between Sessions — Hoy</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <div class="app-shell">
-      <aside class="sidebar">
-        <a class="brand" href="#overview" aria-label="Between Sessions, inicio">
-          <span class="brand-mark">B</span><span>between<br />sessions</span>
-        </a>
-        <nav aria-label="Navegación principal">
-          <a class="nav-link active" href="#overview">Vista de hoy</a>
-          <a class="nav-link" href="#plan">Plan de la semana</a>
-          <a class="nav-link" href="#privacy">Privacidad</a>
-        </nav>
-        <div class="sidebar-note">
-          <span class="eyebrow">Canal privado</span>
-          <strong>Slack DM</strong>
-          <p>Tu empresa no ve esta información.</p>
+    <main class="phone-shell">
+      <header class="app-header">
+        <button class="icon-button" type="button" aria-label="Abrir menú">☰</button>
+        <div class="wordmark"><span class="wordmark-dot"></span>between</div>
+        <button class="avatar-button" type="button" aria-label="Personalizar a Nubo">N</button>
+      </header>
+      <section class="today-heading">
+        <span class="date-label">VIERNES · 12 SEP</span>
+        <h1>Tu día, acompañado.</h1>
+      </section>
+      <section class="companion-stage" aria-label="Nubo, tu compañero">
+        <div class="sky-orb orb-one"></div><div class="sky-orb orb-two"></div>
+        <div id="companion" class="companion calm" aria-label="Nubo está tranquilo">
+          <div class="companion-halo"></div><div class="companion-ear ear-left"></div><div class="companion-ear ear-right"></div>
+          <div class="companion-head"><i class="eye eye-left"></i><i class="eye eye-right"></i><i class="mouth"></i></div>
+          <div class="companion-body"><i class="belly"></i></div>
         </div>
-      </aside>
-
-      <main>
-        <header class="topbar">
-          <div><span class="eyebrow">Viernes · 12 de septiembre</span><h1>Tu semana, a tu ritmo.</h1></div>
-          <button class="profile" type="button" aria-label="Perfil de Ana">A</button>
-        </header>
-
-        <section id="overview" class="hero">
-          <div>
-            <p class="eyebrow">Entre sesiones</p>
-            <h2>Hola, Ana.</h2>
-            <p class="lede">Solo aparecemos cuando una señal o tu plan lo justifica. Hoy no hay nada que hacer.</p>
-          </div>
-          <div class="status-card" aria-live="polite">
-            <span class="status-dot"></span><span id="status-copy">Acompañamiento activo</span>
-            <button id="pause-button" type="button">Pausar</button>
-          </div>
-        </section>
-
-        <section class="metric-grid" aria-label="Resumen semanal">
-          <article class="metric-card"><span class="eyebrow">Sueño promedio</span><strong>7 h 18 min</strong><span class="metric-note">+22 min vs. semana pasada</span></article>
-          <article class="metric-card"><span class="eyebrow">Check-ins</span><strong>2</strong><span class="metric-note">máximo uno cada 20 h</span></article>
-          <article class="metric-card"><span class="eyebrow">Tarea</span><strong>2 / 3</strong><span class="metric-note">caminatas registradas</span></article>
-        </section>
-
-        <section class="content-grid">
-          <article class="panel week-panel">
-            <div class="panel-heading"><div><span class="eyebrow">Señales de esta semana</span><h2>Un vistazo, no un juicio.</h2></div><span class="legend"><i></i> sueño</span></div>
-            <div class="week-chart" role="img" aria-label="Sueño de lunes a domingo entre 6 horas 10 minutos y 7 horas 50 minutos">
-              <div class="bar-group"><span class="bar-label">L</span><span class="bar" style="height:70%"></span><small>7h</small></div>
-              <div class="bar-group"><span class="bar-label">M</span><span class="bar" style="height:78%"></span><small>7h 30</small></div>
-              <div class="bar-group"><span class="bar" style="height:63%"></span><small>6h 20</small></div>
-              <div class="bar-group"><span class="bar-label">J</span><span class="bar calm" style="height:82%"></span><small>7h 50</small></div>
-              <div class="bar-group"><span class="bar-label">V</span><span class="bar calm" style="height:75%"></span><small>7h 18</small></div>
-              <div class="bar-group muted"><span class="bar-label">S</span><span class="bar" style="height:8%"></span><small>—</small></div>
-              <div class="bar-group muted"><span class="bar-label">D</span><span class="bar" style="height:8%"></span><small>—</small></div>
-            </div>
-            <p class="caption">Tus señales se usan para decidir si preguntamos; no son un diagnóstico.</p>
-          </article>
-
-          <article id="plan" class="panel plan-panel">
-            <span class="eyebrow">Plan acordado</span><h2>Esta semana</h2>
-            <div class="plan-item"><span>01</span><p>Notar cómo cambia tu energía después de reuniones largas.</p></div>
-            <div class="plan-item"><span>02</span><p>Caminar 20 minutos tres veces antes del domingo.</p></div>
-            <button id="open-slack" class="primary-button" type="button">Abrir conversación en Slack</button>
-          </article>
-        </section>
-
-        <section id="privacy" class="privacy-panel">
-          <div><span class="eyebrow">Tú decides</span><h2>Lo que compartes se puede cambiar con una palabra.</h2></div>
-          <div class="privacy-actions"><button type="button" data-action="No compartir sueño">No compartir sueño</button><button type="button" data-action="Borrar mis datos">Borrar mis datos</button></div>
-        </section>
-      </main>
-    </div>
+        <div class="stage-ground"></div><span class="companion-name">Nubo</span>
+      </section>
+      <section class="message-card" aria-live="polite">
+        <span class="message-kicker">TU COMPAÑERO DICE</span>
+        <p id="message">Dormiste un poco menos de lo habitual. Hoy no hace falta exigirte: ¿te gustaría salir diez minutos a caminar?</p>
+      </section>
+      <section class="daily-quest" aria-labelledby="quest-title">
+        <div class="quest-heading"><div><span class="section-kicker">RETO SUAVE</span><h2 id="quest-title">Un paseo breve</h2></div><span id="quest-count" class="quest-count">0 / 10 min</span></div>
+        <div class="progress-track" role="progressbar" aria-label="Progreso del paseo" aria-valuemin="0" aria-valuemax="10" aria-valuenow="0"><span id="progress-fill"></span></div>
+        <div class="quest-actions"><button id="accept-quest" class="primary" type="button">Voy a intentarlo</button><button id="choose-another" class="secondary" type="button">Otro reto</button></div>
+      </section>
+      <section class="signal-row" aria-label="Señales conectadas">
+        <div><span class="signal-icon">☾</span><span><small>Sueño</small><strong>6 h 20</strong></span></div>
+        <div><span class="signal-icon">↗</span><span><small>Movimiento</small><strong>2,840 pasos</strong></span></div>
+        <div><span class="signal-icon">✦</span><span><small>Conexión</small><strong>Sin registrar</strong></span></div>
+      </section>
+      <section class="voice-dock" aria-label="Hablar con Nubo">
+        <button id="voice-button" class="voice-button" type="button" aria-pressed="false"><span>⌁</span></button>
+        <div><strong id="voice-title">Habla con Nubo</strong><p id="voice-copy">Mantén pulsado para contarle cómo vas.</p></div>
+      </section>
+      <nav class="bottom-nav" aria-label="Navegación">
+        <button class="nav-item active" type="button">Hoy</button><button class="nav-item" type="button">Recorrido</button><button class="nav-item" type="button">Control</button>
+      </nav>
+    </main>
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
     <script src="app.js"></script>
   </body>

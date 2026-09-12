@@ -31,7 +31,8 @@ bridge/quinde_plan.py ──────────▶/health  ← Health Auto 
 
 | Partner | What it does here | Where |
 |---|---|---|
-| **OpenAI** | Agents SDK for the check-in and brief agents; moderation as the fail-closed safety guardrail | `server/agent/`, `server/guard.py` |
+| **OpenAI** | Agents SDK for the check-in and brief agents (GPT-5.4 mini) | `server/agent/`, `server/llm.py` |
+| **OpenRouter** | Every model call carries a per-request privacy policy (`provider.data_collection: "deny"`, optional `zdr`), and hosts Llama Guard 4 as the fail-closed safety guardrail | `server/llm.py`, `server/guard.py` |
 | **Auth0** | CIBA push approval on the patient's phone before anything reaches the therapist | `server/auth/ciba.py`, `server/app.py` (`/brief`) |
 | **Trigger.dev** | 3-hourly signal evaluation, waitpoint tokens that pause a run until the patient replies, nightly brief | `orchestrator/src/trigger/` |
 | **Mozilla.ai** | `any-llm` runs the local bridge on Ollama with the same call shape as the cloud | `bridge/quinde_plan.py` |

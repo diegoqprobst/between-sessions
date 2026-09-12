@@ -18,4 +18,4 @@ Antes de grabar: correr el puente una vez para calentar Ollama; `scripts/seed_we
 ## Post
 Built today at #AgentsEverywhere (@aitinkerers × @OpenAI, Miami): Between Sessions — the agent that lives *between* therapy sessions.
 The session stays local. Only the plan goes up. An Apple Watch decides when to ask, WhatsApp is where it asks, and the patient approves with a push what the therapist gets to see.
-Thanks @auth0 (consent + CIBA push), @triggerdotdev (waitpoints), @mozilla_ai (any-llm), @googlecloud (Cloud Run). Repo + 2-min demo: <link>
+Thanks @OpenRouterAI (privacy-routed models + Llama Guard), @auth0 (consent + CIBA push), @triggerdotdev (waitpoints), @mozilla_ai (any-llm), @googlecloud (Cloud Run). Repo + 2-min demo: <link>

@@ -7,7 +7,14 @@ def env(name: str, default: str | None = None) -> str | None:
     return os.environ.get(name, default)
 
 OPENAI_API_KEY = env("OPENAI_API_KEY")
-OPENAI_MODEL = env("OPENAI_MODEL", "gpt-5-mini")
+OPENROUTER_API_KEY = env("OPENROUTER_API_KEY")
+# Con OPENROUTER_API_KEY todo el tráfico de modelos va por OpenRouter (modelos con prefijo 'openai/').
+USE_OPENROUTER = bool(OPENROUTER_API_KEY) and not env("FORCE_OPENAI")
+OPENAI_MODEL = env("OPENAI_MODEL", "openai/gpt-5.4-mini" if USE_OPENROUTER else "gpt-5-mini")
+GUARD_MODEL = env("GUARD_MODEL", "meta-llama/llama-guard-4-12b")
+# Política de privacidad por solicitud en OpenRouter: "deny" excluye proveedores que puedan guardar/entrenar con datos.
+OPENROUTER_DATA_COLLECTION = env("OPENROUTER_DATA_COLLECTION", "deny")
+OPENROUTER_ZDR = env("OPENROUTER_ZDR", "0") == "1"
 TWILIO_ACCOUNT_SID = env("TWILIO_ACCOUNT_SID")
 TWILIO_AUTH_TOKEN = env("TWILIO_AUTH_TOKEN")
 TWILIO_FROM = env("TWILIO_FROM", "whatsapp:+14155238886")

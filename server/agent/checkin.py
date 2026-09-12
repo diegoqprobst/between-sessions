@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from agents import Agent, Runner
 from server import config
+from server import llm
 
 class Turn(BaseModel):
     reply: str
@@ -28,7 +29,8 @@ Reglas duras:
 - Cuando cierras (done=true), extraes: mood_1_5 (1 muy mal, 5 muy bien), homework_done si se habló de la tarea, note (una frase objetiva), wants_to_discuss (lo que quiere tratar en sesión, en sus palabras, o vacío).
 """
 
-_agent = Agent(name="checkin", instructions=INSTRUCTIONS, output_type=Turn, model=config.OPENAI_MODEL)
+_agent = Agent(name="checkin", instructions=INSTRUCTIONS, output_type=Turn, model=config.OPENAI_MODEL,
+               model_settings=llm.model_settings())
 
 def _context(patient: dict, plan: dict | None, trigger: str, today: dict | None) -> str:
     watch = ", ".join(plan.get("watch", [])) if plan else "sin plan cargado"

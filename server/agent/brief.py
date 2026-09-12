@@ -1,5 +1,6 @@
 from agents import Agent, Runner
 from server import config
+from server import llm
 
 INSTRUCTIONS = """Redactas, para un psicólogo, el brief de una página previo a la sesión con su paciente. Español, sobrio, sin diagnosticar.
 Formato exacto en markdown, en este orden y con estos títulos:
@@ -11,7 +12,8 @@ Formato exacto en markdown, en este orden y con estos títulos:
 Usa solo los datos dados. No inventes. Si una señal está excluida por el paciente, no la menciones y no expliques por qué.
 """
 
-_agent = Agent(name="brief", instructions=INSTRUCTIONS, model=config.OPENAI_MODEL)
+_agent = Agent(name="brief", instructions=INSTRUCTIONS, model=config.OPENAI_MODEL,
+               model_settings=llm.model_settings())
 
 EXCLUDE_MAP = {"sueño": ("sleep_h",), "sleep": ("sleep_h",), "ánimo": ("mood_valence", "mood_labels"),
                "animo": ("mood_valence", "mood_labels"), "corazón": ("hrv_ms", "resting_hr"), "hrv": ("hrv_ms",)}

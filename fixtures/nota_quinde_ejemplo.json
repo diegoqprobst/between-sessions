@@ -1,0 +1,25 @@
+{
+  "paciente": "Ana",
+  "fecha": "5 de junio, 2026",
+  "sesion_num": 3,
+  "modalidad": "Terapia individual · 50 min",
+  "borrador": false,
+  "riesgo": "Ninguno",
+  "animo": "Estable",
+  "adherencia": "Parcial",
+  "secciones": [
+    {"letra": "C", "titulo": "Contexto", "tag": "Marco de la sesión",
+     "contenido": ["Tercera sesión. Refiere una semana laboral intensa con picos de ansiedad nocturna."]},
+    {"letra": "S", "titulo": "Subjetivo", "tag": "Lo que el paciente refiere",
+     "contenido": ["Describe presión en el pecho antes de dormir y dificultad para 'apagar' la mente.",
+                   "Expresa culpa al poner límites en el trabajo."]},
+    {"letra": "O", "titulo": "Objetivo", "tag": "Observación clínica",
+     "contenido": ["Afecto congruente, colaboradora. Discurso organizado, sin indicadores de riesgo."]},
+    {"letra": "A", "titulo": "Análisis", "tag": "Interpretación e hipótesis",
+     "contenido": ["Ansiedad anticipatoria asociada a autoexigencia y dificultad para delegar.",
+                   "Avance respecto a sesiones previas en la identificación temprana de síntomas."]},
+    {"letra": "P", "titulo": "Plan", "tag": "Intervención y siguientes pasos",
+     "contenido": ["Reforzar respiración 4-7-8 y bitácora nocturna; reestructurar la culpa al poner límites.",
+                   "Próxima sesión: revisar adherencia y explorar rutina de sueño."]}
+  ]
+}

@@ -1,0 +1,15 @@
+[project]
+name = "between-sessions"
+version = "0.1.0"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "fastapi", "uvicorn[standard]", "python-multipart",
+  "openai-agents", "openai", "twilio", "httpx", "python-dotenv", "pydantic",
+  "any-llm-sdk[ollama]",
+]
+[dependency-groups]
+dev = ["pytest", "pytest-asyncio"]
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+[tool.uv]
+package = false

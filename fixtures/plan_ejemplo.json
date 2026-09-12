@@ -1,0 +1,10 @@
+{
+  "patient_ref": "ana",
+  "session_num": 3,
+  "session_date": "2026-09-05",
+  "next_session_date": "2026-09-13",
+  "watch": ["sueño nocturno", "ansiedad anticipatoria antes de dormir", "culpa al poner límites"],
+  "homework": "Respiración 4-7-8 y bitácora nocturna",
+  "next_focus": "Revisar adherencia y explorar rutina de sueño",
+  "risk_baseline": "none"
+}

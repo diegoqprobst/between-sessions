@@ -7,9 +7,6 @@ from server import config, store
 from server.app import handle_inbound
 from server.channels import slack as slack_channel
 
-app = App(token=config.SLACK_BOT_TOKEN)
-
-@app.event("message")
 def on_message(event, say, logger):
     if event.get("channel_type") != "im" or event.get("bot_id") or event.get("subtype"):
         return
@@ -23,6 +20,8 @@ def main() -> None:
     if not (config.SLACK_BOT_TOKEN and config.SLACK_APP_TOKEN):
         raise SystemExit("faltan SLACK_BOT_TOKEN (xoxb-) y SLACK_APP_TOKEN (xapp-) en .env")
     store.init_db()
+    app = App(token=config.SLACK_BOT_TOKEN)
+    app.event("message")(on_message)
     print("[slack] conectado en Socket Mode; escribe un DM al bot")
     SocketModeHandler(app, config.SLACK_APP_TOKEN).start()
 

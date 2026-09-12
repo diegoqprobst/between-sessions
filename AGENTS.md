@@ -11,7 +11,8 @@ Este archivo es el resumen operativo: estado real, cómo correr, qué falta, y t
 
 - La sesión se documenta en local con Quinde (`~/Terapias`, repo `quinde-clinica-local`). **No se toca ese repo.**
 - El puente `bridge/quinde_plan.py` lee la nota C-SOAP (JSON) y sube **solo el plan** (qué vigilar, tarea, fechas).
-- Un agente de bolsillo en WhatsApp acompaña la semana; el Apple Watch (Health Auto Export → `POST /health/{token}`) decide cuándo hablar.
+- Encuadre final (12 sep, tarde): **salud mental del trabajador remoto**. Canal principal **Slack DMs** (`server/slack_app.py`, Socket Mode, `uv run python -m server.slack_app`); WhatsApp es el segundo canal. El id de paciente lleva prefijo (`slack:U…` o `whatsapp:+…`) y `server/channels/__init__.py` enruta la respuesta. Comando `plan: a; b | tarea: c` para plan propio sin terapeuta.
+- El Apple Watch (Health Auto Export → `POST /health/{token}`) decide cuándo hablar.
 - La víspera de la sesión, el brief de una página va al terapeuta **solo si el paciente aprueba** (push Auth0 CIBA, o "sí" por WhatsApp si Auth0 no está configurado).
 - Tesis: confidencialidad por control. Sala local, nube solo plan, bolsillo con consentimiento, al terapeuta solo señal.
 
@@ -64,7 +65,7 @@ Flujo mínimo de prueba:
 
 ## Variables de entorno (`.env.example` tiene todas)
 
-`OPENROUTER_API_KEY` (principal) · `OPENROUTER_DATA_COLLECTION=deny` · `OPENROUTER_ZDR=0` · `OPENAI_API_KEY` (alternativa; con `FORCE_OPENAI=1` fuerza OpenAI directo) · `OPENAI_MODEL` · `GUARD_MODEL` · `TWILIO_*` · `PUBLIC_URL` · `THERAPIST_KEY` · `THERAPIST_EMAIL` · `DB_PATH` · `PATIENT_TZ` · `AUTH0_*` · `TRIGGER_SECRET_KEY` · `TRIGGER_API_URL` · `SMTP_*` · `OLLAMA_MODEL`.
+`SLACK_BOT_TOKEN` (xoxb) · `SLACK_APP_TOKEN` (xapp, Socket Mode) · `OPENROUTER_API_KEY` (principal) · `OPENROUTER_DATA_COLLECTION=deny` · `OPENROUTER_ZDR=0` · `OPENAI_API_KEY` (alternativa; con `FORCE_OPENAI=1` fuerza OpenAI directo) · `OPENAI_MODEL` · `GUARD_MODEL` · `TWILIO_*` · `PUBLIC_URL` · `THERAPIST_KEY` · `THERAPIST_EMAIL` · `DB_PATH` · `PATIENT_TZ` · `AUTH0_*` · `TRIGGER_SECRET_KEY` · `TRIGGER_API_URL` · `SMTP_*` · `OLLAMA_MODEL`.
 
 ## Mapa de archivos
 

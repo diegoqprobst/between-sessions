@@ -9,7 +9,7 @@ Most agents wait in a chat window. Between Sessions lives where therapy actually
 ## Video (2:00)
 0:00 Título + "Los agentes esperan en un chat. Este vive entre sesiones de terapia."
 0:10 Sala: Quinde local → puente → "solo esto sube" (plan JSON en pantalla).
-0:35 Bolsillo: Watch → señal de sueño corto → Trigger.dev dispara → pregunta en WhatsApp → dos respuestas → cierre.
+0:35 Trabajo: Watch → señal de sueño corto → Trigger.dev dispara → pregunta por DM de Slack → dos respuestas → cierre.
 1:15 Control: 'no compartas sueño' + push de Auth0 en el celular → aprobar → correo con el brief.
 1:45 Tesis: "Confidencialidad por control: quién ve qué está en la arquitectura." Partners y qué hizo cada uno.
 
@@ -17,5 +17,5 @@ Antes de grabar: correr el puente una vez para calentar Ollama; `scripts/seed_we
 
 ## Post
 Built today at #AgentsEverywhere (@aitinkerers × @OpenAI, Miami): Between Sessions — the agent that lives *between* therapy sessions.
-The session stays local. Only the plan goes up. An Apple Watch decides when to ask, WhatsApp is where it asks, and the patient approves with a push what the therapist gets to see.
+The session stays local. Only the plan goes up. An Apple Watch decides when to ask, Slack DMs are where it asks, and the patient approves with a push what the therapist gets to see.
 Thanks @OpenRouterAI (privacy-routed models + Llama Guard), @auth0 (consent + CIBA push), @triggerdotdev (waitpoints), @mozilla_ai (any-llm), @googlecloud (Cloud Run). Repo + 2-min demo: <link>

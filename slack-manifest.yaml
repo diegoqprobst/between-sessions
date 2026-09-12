@@ -1,0 +1,21 @@
+display_information:
+  name: Between Sessions
+  description: The agent that lives between sessions. Yours, not your employer's.
+features:
+  bot_user:
+    display_name: Between Sessions
+    always_online: true
+oauth_config:
+  scopes:
+    bot:
+      - chat:write
+      - im:history
+      - im:write
+      - users:read
+settings:
+  event_subscriptions:
+    bot_events:
+      - message.im
+  socket_mode_enabled: true
+  interactivity:
+    is_enabled: false

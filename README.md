@@ -1,8 +1,8 @@
 # Between Sessions
 
-**The agent that lives between therapy sessions.**
+**Mental health for remote workers, inside the tool they already live in.**
 
-The session is documented locally: audio, transcript and clinical note never leave the therapist's Mac (via [quinde-clinica-local](https://github.com/diegoqprobst/quinde-clinica-local)). Only the structured *plan* goes to the cloud. During the week, a pocket agent on WhatsApp accompanies the patient, guided by Apple Watch signals: it asks one question when sleep, HRV or a logged mood justifies it, not on a schedule. The night before the next session, the therapist receives a one-page brief the patient approved with a push on their phone.
+The agent that lives between therapy or coaching sessions. The session is documented locally: audio, transcript and note never leave the clinician's Mac (via [quinde-clinica-local](https://github.com/diegoqprobst/quinde-clinica-local)). Only the structured *plan* goes to the cloud, or the worker sets their own plan from the chat. During the week, an agent in **Slack DMs** (WhatsApp as a second door) accompanies the person, guided by Apple Watch signals: it asks one question when sleep, HRV or a logged mood justifies it, not on a schedule. The night before the next session, the clinician receives a one-page brief the person approved with a push on their phone. The employer sees nothing, ever.
 
 > Built in one day at *Agents, Everywhere* (AI Tinkerers × OpenAI, Miami, Sept 12 2026). Every piece of data in this repo, the video and the post is synthetic. This tool *accompanies, records and summarizes for a clinician*. It does not detect or diagnose anything.
 
@@ -37,7 +37,8 @@ bridge/quinde_plan.py ──────────▶/health  ← Health Auto 
 | **Trigger.dev** | 3-hourly signal evaluation, waitpoint tokens that pause a run until the patient replies, nightly brief | `orchestrator/src/trigger/` |
 | **Mozilla.ai** | `any-llm` runs the local bridge on Ollama with the same call shape as the cloud | `bridge/quinde_plan.py` |
 | **Google Cloud Run** | Hosts the FastAPI server | `Dockerfile`, `deploy.sh` |
-| Twilio (not a sponsor) | WhatsApp Sandbox channel, signature validation | `server/channels/twilio.py` |
+| Slack (Bolt, Socket Mode) | Primary channel: DMs with the bot, where the remote worker already is | `server/slack_app.py`, `server/channels/slack.py` |
+| Twilio (not a sponsor) | WhatsApp Sandbox as second channel, signature validation | `server/channels/twilio.py` |
 | Health Auto Export (not a sponsor) | Pushes Apple Health JSON (sleep, HRV, resting HR, steps, State of Mind) to our endpoint | `server/signals/health.py` |
 
 ## Run it
@@ -49,7 +50,8 @@ uv run uvicorn server.app:app --port 8000  # terminal 1
 ngrok http --url=YOUR-DOMAIN.ngrok-free.app 8000   # terminal 2; set the Twilio Sandbox webhook to /twilio/webhook
 ```
 
-1. Patient sends `hola` to the Sandbox number, then their name.
+0. Slack: create the app from `slack-manifest.yaml`, install it, put `SLACK_BOT_TOKEN` (xoxb) and `SLACK_APP_TOKEN` (xapp) in `.env`, then `uv run python -m server.slack_app` (terminal 3).
+1. The person DMs the bot `hola` (Slack) or texts the Sandbox number (WhatsApp), then their name. Optional self-plan: `plan: dormir 7h; cortar a las 6 | tarea: caminar 20 min`.
 2. Therapist publishes the plan from the local note: `uv run python bridge/quinde_plan.py fixtures/nota_quinde_ejemplo.json --next-session 2026-09-13` (or seed a synthetic week: `uv run python scripts/seed_week.py ana`).
 3. Apple Watch data arrives via Health Auto Export → `POST /health/{token}`.
 4. `cd orchestrator && npm i && npx trigger.dev@latest dev` and run `evaluate-signals` from the dashboard. The check-in lands on WhatsApp; the run waits up to 6 h for the reply.

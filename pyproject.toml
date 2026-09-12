@@ -16,7 +16,11 @@ dependencies = [
   "slack-bolt>=1.30.0",
 ]
 [dependency-groups]
-dev = ["pytest", "pytest-asyncio"]
+dev = [
+    "httpx>=0.28.1",
+    "pytest",
+    "pytest-asyncio",
+]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 [tool.uv]

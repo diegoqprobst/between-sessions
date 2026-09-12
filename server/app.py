@@ -1,13 +1,17 @@
 from datetime import datetime, timezone, date, timedelta
+from pathlib import Path
 from fastapi import FastAPI, Request, Header, HTTPException, Response
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from server import config, store, decide, guard, trigger_client
 from server import channels, research
+from server.api import router as api_router
 from server.channels import twilio as wa
 from server.signals import health as health_signals
 from server.agent import checkin as checkin_agent
 
 app = FastAPI(title="Between Sessions")
+app.include_router(api_router)
 
 @app.on_event("startup")
 def _startup():
@@ -42,9 +46,19 @@ def decide_all(x_therapist_key: str | None = Header(default=None)):
             out.append({"patient_id": p["id"], "trigger": t[0]})
     return {"triggered": out}
 
+WEB_DIR = Path(__file__).resolve().parent.parent / "web"
+
 @app.get("/health")
 def health():
     return {"ok": True}
+
+@app.get("/panel")
+def panel():
+    """Panel de solo lectura. Lo construye Codex en web/index.html (ver docs/frontend-contract.md)."""
+    index = WEB_DIR / "index.html"
+    if not index.exists():
+        raise HTTPException(404, "panel not built yet: see docs/frontend-contract.md")
+    return FileResponse(index)
 
 @app.post("/twilio/webhook")
 async def twilio_webhook(request: Request, x_twilio_signature: str | None = Header(default=None)):

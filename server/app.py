@@ -113,8 +113,20 @@ async def handle_inbound(sender: str, body: str) -> str | None:
     store.add_message(pid, "out", result.reply)
     return result.reply
 
-async def _send_brief_after_approval(p: dict) -> str:
-    return "Gracias, lo envío."  # se reemplaza en la Tarea 6
+def _deliver_brief(p: dict, content: str, bid: int) -> str:
+    to = p.get("therapist_email") or config.THERAPIST_EMAIL
+    ok = mail.send(to, f"[Between Sessions] Brief previo a sesión — {p.get('name')}", content)
+    store.set_brief(bid, approved=1, sent=int(ok))
+    wa.send(p["phone"], "Enviado a tu terapeuta. Gracias por esta semana.")
+    return "sent"
+
+async def _send_brief_after_approval(p: dict) -> str | None:
+    b = store.latest_brief(p["id"])
+    store.set_patient(p["id"], awaiting_brief=0)
+    if not b:
+        return "No tengo un resumen pendiente."
+    _deliver_brief(p, b["content"], b["id"])
+    return None  # _deliver_brief ya avisó por WhatsApp
 
 def _notify_therapist_risk(p: dict) -> None:
     from server import mail
@@ -141,3 +153,57 @@ def start_checkin(body: CheckinIn, x_therapist_key: str | None = Header(default=
     store.add_message(p["id"], "out", q)
     wa.send(p["phone"], q)
     return {"sent": True, "question": q}
+
+class PlanIn(BaseModel):
+    patient_ref: str
+    session_num: int | None = None
+    session_date: str
+    next_session_date: str
+    watch: list[str] = []
+    homework: str = ""
+    next_focus: str = ""
+    risk_baseline: str = "none"
+
+@app.post("/plans")
+def post_plan(plan: PlanIn, x_therapist_key: str | None = Header(default=None)):
+    require_key(x_therapist_key)
+    p = store.patient_by_ref(plan.patient_ref)
+    if not p:
+        raise HTTPException(404, f"no patient with ref {plan.patient_ref}; el paciente debe escribir 'hola' primero")
+    store.add_plan(p["id"], plan.model_dump())
+    return {"patient_id": p["id"]}
+
+class BriefIn(BaseModel):
+    patient_id: int | None = None
+    force: bool = False
+
+@app.post("/brief")
+def make_briefs(body: BriefIn, x_therapist_key: str | None = Header(default=None)):
+    require_key(x_therapist_key)
+    tomorrow = (date.today() + timedelta(days=1)).isoformat()
+    results = []
+    patients = [store.get_patient(body.patient_id)] if body.patient_id else store.list_patients()
+    for p in patients:
+        if not p or p["paused"] or not p["ref"]:
+            continue
+        plan = store.latest_plan(p["id"])
+        if not body.force and (not plan or plan.get("next_session_date") != tomorrow):
+            results.append({"patient_id": p["id"], "status": "skipped"}); continue
+        content = brief_agent.compose(p, plan, store.signals_since(p["id"], 7), store.checkins_since(p["id"], 7),
+                                      p.get("excluded_signals") or [])
+        bid = store.add_brief(p["id"], content)
+        if ciba.enabled() and p.get("auth0_sub"):
+            req = ciba.request(p["auth0_sub"], "Compartir brief con tu terapeuta")
+            approved = ciba.poll(req["auth_req_id"], int(req.get("interval", 5)), 120)
+            if approved:
+                results.append({"patient_id": p["id"], "status": _deliver_brief(p, content, bid)})
+            else:
+                store.set_brief(bid, approved=0)
+                mail.send(p.get("therapist_email") or config.THERAPIST_EMAIL,
+                          f"[Between Sessions] {p.get('name')} no aprobó compartir esta semana", "Sin contenido.")
+                results.append({"patient_id": p["id"], "status": "denied"})
+        else:
+            store.set_patient(p["id"], awaiting_brief=1)
+            wa.send(p["phone"], "Preparé el resumen de tu semana para tu terapeuta. ¿Lo envío? Responde 'sí' o 'no'.")
+            results.append({"patient_id": p["id"], "status": "awaiting_whatsapp"})
+    return {"results": results}

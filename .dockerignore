@@ -1,0 +1,4 @@
+.venv
+orchestrator/node_modules
+*.sqlite
+.env

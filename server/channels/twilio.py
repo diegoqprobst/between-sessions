@@ -12,7 +12,10 @@ def client() -> Client:
     return _client
 
 def send(to: str, body: str) -> str:
-    """to: 'whatsapp:+1305...' . Devuelve el SID del mensaje."""
+    """to: 'whatsapp:+1305...' . Devuelve el SID del mensaje. Sin credenciales, imprime (modo local)."""
+    if not (config.TWILIO_ACCOUNT_SID and config.TWILIO_AUTH_TOKEN):
+        print(f"[whatsapp] (sin Twilio) → {to}: {body}")
+        return "local"
     msg = client().messages.create(from_=config.TWILIO_FROM, to=to, body=body)
     return msg.sid
 

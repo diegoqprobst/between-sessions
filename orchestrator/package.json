@@ -1,0 +1,6 @@
+{
+  "name": "between-sessions-orchestrator",
+  "private": true,
+  "type": "module",
+  "scripts": { "dev": "trigger.dev dev", "deploy": "trigger.dev deploy" }
+}

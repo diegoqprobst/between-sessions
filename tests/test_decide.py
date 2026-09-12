@@ -20,7 +20,7 @@ def test_no_baseline_no_sleep_trigger():
     assert "sleep_drop" not in triggers(r, None, None, NOON, TZ)
 
 def test_low_mood():
-    r = rows(7.0, 7.0, 7.0, 7.0)
+    r = rows(*[7.0] * 10)  # última fila = 2026-09-10, mismo día que NOON
     r[-1]["mood_valence"] = -0.6
     assert "low_mood" in triggers(r, None, None, NOON, TZ)
 

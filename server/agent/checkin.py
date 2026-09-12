@@ -29,8 +29,16 @@ Reglas duras:
 - Cuando cierras (done=true), extraes: mood_1_5 (1 muy mal, 5 muy bien), homework_done si se habló de la tarea, note (una frase objetiva), wants_to_discuss (lo que quiere tratar en sesión, en sus palabras, o vacío).
 """
 
-_agent = Agent(name="checkin", instructions=INSTRUCTIONS, output_type=Turn, model=llm.model_id(),
-               model_settings=llm.model_settings())
+def _instructions() -> str:
+    # Los modelos locales de razonamiento gastan medio minuto pensando un saludo.
+    # El check-in es una frase: no necesita cadena de pensamiento.
+    return ("/no_think\n" + INSTRUCTIONS) if llm.is_local() else INSTRUCTIONS
+
+def _build() -> Agent:
+    return Agent(name="checkin", instructions=_instructions(), output_type=Turn,
+                 model=llm.model_id(), model_settings=llm.model_settings())
+
+_agent = _build()
 
 def _context(patient: dict, plan: dict | None, trigger: str, today: dict | None) -> str:
     watch = ", ".join(plan.get("watch", [])) if plan else "sin plan cargado"

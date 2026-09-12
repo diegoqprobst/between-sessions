@@ -100,7 +100,10 @@ Flujo mínimo de prueba:
 Los créditos del evento son de **Codex, no de API**. Los de OpenRouter los robaron. Así que:
 
 - `server/llm.py` resuelve el proveedor por clave presente: **OpenRouter → Gemini → OpenAI**. `FORCE_PROVIDER` lo fija a mano.
-- **Camino recomendado hoy: Gemini.** Clave gratis en aistudio.google.com, sin tarjeta; endpoint compatible con OpenAI, así que el Agents SDK no cambia. `GEMINI_API_KEY=` en `.env` y ya. Google es patrocinador (Cloud Run).
+- **Decisión final (12 sep): TODO LOCAL.** `LOCAL_FIRST=1` (por defecto) manda sobre cualquier clave: agente, brief y guardrail corren en Ollama. Es la tesis llevada al final. `LOCAL_FIRST=0` devuelve el mando a la nube si hace falta para grabar.
+- **Latencia local medida:** primera llamada ~155 s (carga del modelo), luego 30–45 s por turno con `qwen3:14b`. Calienta el modelo antes de grabar. `/no_think` va inyectado en las instrucciones cuando el proveedor es local.
+- **El guardrail local falla en español.** `llama-guard3:1b` acierta las tres frases de ideación en inglés y falla dos de tres en español ("ya no quiero seguir viviendo" → safe). Por eso `guard.py` tiene una **red determinista de frases** que corre ANTES y cuyo veredicto el modelo no puede desdecir. Si tocas el guardrail, no quites esa red.
+- Alternativa si hiciera falta: Gemini. Clave gratis en aistudio.google.com, sin tarjeta; endpoint compatible con OpenAI, así que el Agents SDK no cambia. `GEMINI_API_KEY=` en `.env` y ya. Google es patrocinador (Cloud Run).
 - `model_id()` normaliza el nombre del modelo al proveedor activo; **deja `OPENAI_MODEL` vacío** salvo que quieras forzar uno.
 - El guardrail sigue al proveedor: Llama Guard 4 si hay OpenRouter, si no el propio modelo de chat con el mismo formato de salida (`safe` / `unsafe\nS11`), parseado por la misma función probada. Sin ninguna clave no hay veredicto y el agente calla.
 - **El puente sigue en Ollama a propósito**: que la nota clínica se lea en la máquina del terapeuta ES la tesis, no una limitación.

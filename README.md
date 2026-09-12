@@ -34,7 +34,7 @@ Slack Socket Mode (`server/slack_app.py`) ── private DMs only ──▶ same
 | Partner | What it does here | Where |
 |---|---|---|
 | **OpenAI** | Agents SDK for the check-in and brief agents (GPT-5.4 mini) | `server/agent/`, `server/llm.py` |
-| **Google** | Gemini (OpenAI-compatible endpoint) is the default model when a `GEMINI_API_KEY` is present, and Cloud Run hosts the server | `server/llm.py`, `deploy.sh` |
+| **Google** | Cloud Run hosts the server; Gemini is a supported provider via its OpenAI-compatible endpoint | `deploy.sh`, `server/llm.py` |
 | **OpenRouter** | Optional routing with a per-request privacy policy (`provider.data_collection: "deny"`, optional `zdr`) plus Llama Guard 4 as a dedicated guardrail. Present key wins; model ids are normalized per provider | `server/llm.py`, `server/guard.py` |
 | **Exa** | `sugerir` searches public-health sources (WHO, NIH, CDC, APA, NHS) so a worker without a clinician can pick a weekly focus, each option cited | `server/research.py` |
 | **Auth0** | CIBA push approval on the patient's phone before anything reaches the therapist | `server/auth/ciba.py`, `server/app.py` (`/brief`) |
@@ -68,7 +68,14 @@ Every endpoint has a fixture: `fixtures/health_sample.json`, `fixtures/plan_ejem
 
 ## Safety
 
-Every inbound message goes through the guardrail before any model sees it. If the guardrail is unavailable, the message is not processed (fail closed). If self-harm categories fire, the agent replies with the 988 Suicide & Crisis Lifeline (US) / 911 and notifies the therapist per the plan consented at onboarding. No patient text is included in that notification.
+Every inbound message passes two layers before any model sees it, and the layers cannot cancel each other out.
+
+1. **A deterministic phrase net** for explicit ideation, in Spanish and English, with common idioms excluded (`me muero de sueño` is not ideation). It runs first and its verdict is final.
+2. **A classifier** second: Llama Guard 3 locally, Llama Guard 4 on OpenRouter, or the active chat model using the same output format. It can only *add* risk, never remove it.
+
+The net exists because we tested the classifier and it failed. `llama-guard3:1b` correctly flagged all three English phrasings of suicidal ideation and missed two of three in Spanish, including "ya no quiero seguir viviendo". Since the agent speaks Spanish to the person, shipping the classifier alone would have been a false promise. See `tests/test_guard.py`.
+
+If neither layer can return a verdict, the message is not processed (fail closed). When risk fires, the agent replies with the 988 Suicide & Crisis Lifeline (US) / 911 and notifies the clinician per the plan consented at onboarding. No patient text is included in that notification.
 
 ## Path to production (what a hackathon cannot do in a day)
 

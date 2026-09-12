@@ -59,7 +59,8 @@ def suggest() -> str:
             messages=[{"role": "system", "content": INSTRUCTIONS},
                       {"role": "user", "content": as_context(results)}],
             extra_body=llm.provider_policy())
-        focos = [l.strip(" -•").strip() for l in res.choices[0].message.content.splitlines() if l.strip()]
+        content = llm.strip_thinking(res.choices[0].message.content)
+        focos = [l.strip(" -•").strip() for l in content.splitlines() if l.strip()]
         return format_reply(focos, sources(results))
     except Exception:
         return format_reply([], [])

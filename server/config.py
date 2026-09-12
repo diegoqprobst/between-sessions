@@ -9,8 +9,12 @@ def env(name: str, default: str | None = None) -> str | None:
 OPENAI_API_KEY = env("OPENAI_API_KEY")
 OPENROUTER_API_KEY = env("OPENROUTER_API_KEY")
 GEMINI_API_KEY = env("GEMINI_API_KEY", "")
-# Fuerza un proveedor concreto: "openrouter" | "gemini" | "openai". Vacío = autodetección por clave.
+# Fuerza un proveedor: "ollama" | "openrouter" | "gemini" | "openai". Vacío = autodetección.
 FORCE_PROVIDER = env("FORCE_PROVIDER", "")
+# Por defecto TODO corre en local (Ollama). Es la tesis del proyecto, no una limitación.
+LOCAL_FIRST = env("LOCAL_FIRST", "1") == "1"
+LOCAL_MODEL = env("LOCAL_MODEL", "qwen3:14b")
+LOCAL_GUARD_MODEL = env("LOCAL_GUARD_MODEL", "llama-guard3:1b")
 # El proveedor activo lo resuelve server.llm.provider(); OPENAI_MODEL vacío = modelo por defecto de ese proveedor.
 OPENAI_MODEL = env("OPENAI_MODEL", "")
 GUARD_MODEL = env("GUARD_MODEL", "meta-llama/llama-guard-4-12b")

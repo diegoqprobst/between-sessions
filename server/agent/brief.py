@@ -12,7 +12,10 @@ Formato exacto en markdown, en este orden y con estos títulos:
 Usa solo los datos dados. No inventes. Si una señal está excluida por el paciente, no la menciones y no expliques por qué.
 """
 
-_agent = Agent(name="brief", instructions=INSTRUCTIONS, model=llm.model_id(),
+def _instructions() -> str:
+    return ("/no_think\n" + INSTRUCTIONS) if llm.is_local() else INSTRUCTIONS
+
+_agent = Agent(name="brief", instructions=_instructions(), model=llm.model_id(),
                model_settings=llm.model_settings())
 
 EXCLUDE_MAP = {"sueño": ("sleep_h",), "sleep": ("sleep_h",), "ánimo": ("mood_valence", "mood_labels"),

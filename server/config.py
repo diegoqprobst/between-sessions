@@ -8,9 +8,11 @@ def env(name: str, default: str | None = None) -> str | None:
 
 OPENAI_API_KEY = env("OPENAI_API_KEY")
 OPENROUTER_API_KEY = env("OPENROUTER_API_KEY")
-# Con OPENROUTER_API_KEY todo el tráfico de modelos va por OpenRouter (modelos con prefijo 'openai/').
-USE_OPENROUTER = bool(OPENROUTER_API_KEY) and not env("FORCE_OPENAI")
-OPENAI_MODEL = env("OPENAI_MODEL", "openai/gpt-5.4-mini" if USE_OPENROUTER else "gpt-5-mini")
+GEMINI_API_KEY = env("GEMINI_API_KEY", "")
+# Fuerza un proveedor concreto: "openrouter" | "gemini" | "openai". Vacío = autodetección por clave.
+FORCE_PROVIDER = env("FORCE_PROVIDER", "")
+# El proveedor activo lo resuelve server.llm.provider(); OPENAI_MODEL vacío = modelo por defecto de ese proveedor.
+OPENAI_MODEL = env("OPENAI_MODEL", "")
 GUARD_MODEL = env("GUARD_MODEL", "meta-llama/llama-guard-4-12b")
 # Política de privacidad por solicitud en OpenRouter: "deny" excluye proveedores que puedan guardar/entrenar con datos.
 OPENROUTER_DATA_COLLECTION = env("OPENROUTER_DATA_COLLECTION", "deny")

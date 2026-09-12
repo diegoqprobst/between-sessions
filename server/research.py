@@ -10,7 +10,8 @@ QUERY = ("what remote workers commonly protect for their mental health: sleep, w
          "isolation, screen time before bed, movement during the day")
 
 def enabled() -> bool:
-    return bool(config.EXA_API_KEY)
+    """Necesita Exa para buscar y un modelo para resumir lo encontrado."""
+    return bool(config.EXA_API_KEY) and llm.configured()
 
 def search(query: str = QUERY, limit: int = 5) -> list[dict]:
     r = httpx.post(EXA_URL, headers={"x-api-key": config.EXA_API_KEY, "content-type": "application/json"},
@@ -57,7 +58,7 @@ def suggest() -> str:
             model=llm.model_id(), max_tokens=200, temperature=0.3,
             messages=[{"role": "system", "content": INSTRUCTIONS},
                       {"role": "user", "content": as_context(results)}],
-            extra_body=llm.provider_policy() if config.USE_OPENROUTER else {})
+            extra_body=llm.provider_policy())
         focos = [l.strip(" -•").strip() for l in res.choices[0].message.content.splitlines() if l.strip()]
         return format_reply(focos, sources(results))
     except Exception:

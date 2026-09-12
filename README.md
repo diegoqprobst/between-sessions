@@ -34,11 +34,12 @@ Slack Socket Mode (`server/slack_app.py`) ── private DMs only ──▶ same
 | Partner | What it does here | Where |
 |---|---|---|
 | **OpenAI** | Agents SDK for the check-in and brief agents (GPT-5.4 mini) | `server/agent/`, `server/llm.py` |
-| **OpenRouter** | Optional routing for every model call, carrying a per-request privacy policy (`provider.data_collection: "deny"`, optional `zdr`), plus Llama Guard 4 as the guardrail. Set `OPENROUTER_API_KEY` and it takes over; model ids are normalized either way | `server/llm.py`, `server/guard.py` |
+| **Google** | Gemini (OpenAI-compatible endpoint) is the default model when a `GEMINI_API_KEY` is present, and Cloud Run hosts the server | `server/llm.py`, `deploy.sh` |
+| **OpenRouter** | Optional routing with a per-request privacy policy (`provider.data_collection: "deny"`, optional `zdr`) plus Llama Guard 4 as a dedicated guardrail. Present key wins; model ids are normalized per provider | `server/llm.py`, `server/guard.py` |
 | **Exa** | `sugerir` searches public-health sources (WHO, NIH, CDC, APA, NHS) so a worker without a clinician can pick a weekly focus, each option cited | `server/research.py` |
 | **Auth0** | CIBA push approval on the patient's phone before anything reaches the therapist | `server/auth/ciba.py`, `server/app.py` (`/brief`) |
 | **Trigger.dev** | 3-hourly signal evaluation, waitpoint tokens that pause a run until the patient replies, nightly brief | `orchestrator/src/trigger/` |
-| **Mozilla.ai** | `any-llm` runs the local bridge on Ollama with the same call shape as the cloud | `bridge/quinde_plan.py` |
+| **Mozilla.ai** | `any-llm` runs the local bridge on Ollama, so the clinical note is read on the therapist's own machine with the same call shape as the cloud | `bridge/quinde_plan.py` |
 | **Google Cloud Run** | Hosts the FastAPI server | `Dockerfile`, `deploy.sh` |
 | Slack (Bolt, Socket Mode) | Primary channel: DMs with the bot, where the remote worker already is | `server/slack_app.py`, `server/channels/slack.py` |
 | Twilio (not a sponsor) | WhatsApp Sandbox as second channel, signature validation | `server/channels/twilio.py` |

@@ -14,3 +14,9 @@ def test_other_category_is_not_risk():
 def test_garbage_has_no_verdict():
     assert parse_llama_guard("I think this is fine")["ok"] is False
     assert parse_llama_guard("")["ok"] is False
+
+
+def test_guard_fails_closed_without_provider(monkeypatch):
+    from server import guard, llm
+    monkeypatch.setattr(llm, "configured", lambda: False)
+    assert guard.assess("cualquier cosa") == {"ok": False, "risk": None, "categories": []}

@@ -34,7 +34,8 @@ Slack Socket Mode (`server/slack_app.py`) ── private DMs only ──▶ same
 | Partner | What it does here | Where |
 |---|---|---|
 | **OpenAI** | Agents SDK for the check-in and brief agents (GPT-5.4 mini) | `server/agent/`, `server/llm.py` |
-| **OpenAI** | Direct model and moderation fallback for the demo; the guardrail fails closed if it cannot return a verdict | `server/llm.py`, `server/guard.py` |
+| **OpenRouter** | Optional routing for every model call, carrying a per-request privacy policy (`provider.data_collection: "deny"`, optional `zdr`), plus Llama Guard 4 as the guardrail. Set `OPENROUTER_API_KEY` and it takes over; model ids are normalized either way | `server/llm.py`, `server/guard.py` |
+| **Exa** | `sugerir` searches public-health sources (WHO, NIH, CDC, APA, NHS) so a worker without a clinician can pick a weekly focus, each option cited | `server/research.py` |
 | **Auth0** | CIBA push approval on the patient's phone before anything reaches the therapist | `server/auth/ciba.py`, `server/app.py` (`/brief`) |
 | **Trigger.dev** | 3-hourly signal evaluation, waitpoint tokens that pause a run until the patient replies, nightly brief | `orchestrator/src/trigger/` |
 | **Mozilla.ai** | `any-llm` runs the local bridge on Ollama with the same call shape as the cloud | `bridge/quinde_plan.py` |
@@ -52,7 +53,7 @@ uv run uvicorn server.app:app --port 8000  # terminal 1
 ```
 
 0. Slack: create the app from `slack-manifest.yaml`, enable Socket Mode, create its app-level token with `connections:write`, install it, put `SLACK_BOT_TOKEN` (`xoxb-`) and `SLACK_APP_TOKEN` (`xapp-`) in `.env`, then run `uv run python -m server.slack_app` (terminal 2). The manifest subscribes only to `message.im`; it does not read channels.
-1. The person DMs the bot `hola` (Slack) or texts the Sandbox number (WhatsApp), then their name. Optional self-plan: `plan: dormir 7h; cortar a las 6 | tarea: caminar 20 min`.
+1. The person DMs the bot `hola` (Slack) or texts the Sandbox number (WhatsApp), then their name. Optional: `sugerir` for cited suggestions, then `plan: dormir 7h; cortar a las 6 | tarea: caminar 20 min`.
 2. Therapist publishes the plan from the local note: `uv run python bridge/quinde_plan.py fixtures/nota_quinde_ejemplo.json --next-session 2026-09-13` (or seed a synthetic week: `uv run python scripts/seed_week.py ana`).
 3. Apple Watch data arrives via Health Auto Export → `POST /health/{token}`.
 4. `cd orchestrator && npm i && npx trigger.dev@latest dev` and run `evaluate-signals` from the dashboard. The check-in lands in the Slack DM; the run waits up to 6 h for the reply.

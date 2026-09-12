@@ -5,6 +5,15 @@ from server import config
 
 OPENROUTER_BASE = "https://openrouter.ai/api/v1"
 
+def model_id(name: str | None = None) -> str:
+    """Normaliza el id del modelo al destino activo.
+    OpenRouter exige prefijo de proveedor ('openai/gpt-5-mini'); OpenAI directo lo rechaza.
+    Así el mismo .env funciona en los dos caminos."""
+    name = name or config.OPENAI_MODEL
+    if config.USE_OPENROUTER:
+        return name if "/" in name else f"openai/{name}"
+    return name.split("/", 1)[1] if name.startswith("openai/") else name
+
 def provider_policy() -> dict:
     policy = {"data_collection": config.OPENROUTER_DATA_COLLECTION}
     if config.OPENROUTER_ZDR:

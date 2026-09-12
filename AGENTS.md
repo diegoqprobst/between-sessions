@@ -65,7 +65,7 @@ Flujo mínimo de prueba:
 
 ## Variables de entorno (`.env.example` tiene todas)
 
-`SLACK_BOT_TOKEN` (xoxb) · `SLACK_APP_TOKEN` (xapp, Socket Mode) · `OPENROUTER_API_KEY` (principal) · `OPENROUTER_DATA_COLLECTION=deny` · `OPENROUTER_ZDR=0` · `OPENAI_API_KEY` (alternativa; con `FORCE_OPENAI=1` fuerza OpenAI directo) · `OPENAI_MODEL` · `GUARD_MODEL` · `TWILIO_*` · `PUBLIC_URL` · `THERAPIST_KEY` · `THERAPIST_EMAIL` · `DB_PATH` · `PATIENT_TZ` · `AUTH0_*` · `TRIGGER_SECRET_KEY` · `TRIGGER_API_URL` · `SMTP_*` · `OLLAMA_MODEL`.
+`EXA_API_KEY` (comando `sugerir`, opcional) · `SLACK_BOT_TOKEN` (xoxb) · `SLACK_APP_TOKEN` (xapp, Socket Mode) · `OPENROUTER_API_KEY` (principal) · `OPENROUTER_DATA_COLLECTION=deny` · `OPENROUTER_ZDR=0` · `OPENAI_API_KEY` (alternativa; con `FORCE_OPENAI=1` fuerza OpenAI directo) · `OPENAI_MODEL` · `GUARD_MODEL` · `TWILIO_*` · `PUBLIC_URL` · `THERAPIST_KEY` · `THERAPIST_EMAIL` · `DB_PATH` · `PATIENT_TZ` · `AUTH0_*` · `TRIGGER_SECRET_KEY` · `TRIGGER_API_URL` · `SMTP_*` · `OLLAMA_MODEL`.
 
 ## Mapa de archivos
 
@@ -88,6 +88,12 @@ Flujo mínimo de prueba:
 | `scripts/seed_week.py`, `fixtures/*` | Semana sintética, plan de ejemplo, nota de ejemplo, simulador de webhook |
 | `Dockerfile`, `deploy.sh` | Cloud Run (requiere billing) |
 | `README.md`, `docs/submission.md` | Entrega: descripción, tabla de partners, guion del video, post |
+
+## Añadido el 12 sep (tarde)
+
+- `server/research.py` + comando `sugerir`: busca en dominios de salud pública con Exa y propone 3 focos citados, para quien no llega con plan de terapeuta. Sin `EXA_API_KEY` cae elegantemente a "escríbeme tu plan".
+- `llm.model_id()` normaliza el id del modelo según el destino: OpenRouter exige prefijo (`openai/gpt-5-mini`), OpenAI directo lo rechaza. El mismo `.env` sirve para ambos; no vuelvas a poner el prefijo a mano.
+- Codex arregló `conversations_open` en `server/channels/slack.py`: sin eso los check-ins programados no podían abrir el DM.
 
 ## Pendientes, en orden
 

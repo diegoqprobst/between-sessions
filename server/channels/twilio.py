@@ -24,7 +24,7 @@ def valid_signature(url: str, params: dict, signature: str | None) -> bool:
         return True
     return RequestValidator(config.TWILIO_AUTH_TOKEN).validate(url, params, signature or "")
 
-_CMD = re.compile(r"^\s*(pausa|pause|reanudar|resume|borrar|delete|no compartas|don't share|plan:|plan)\s*(.*)$", re.I)
+_CMD = re.compile(r"^\s*(pausa|pause|reanudar|resume|borrar|delete|no compartas|don't share|plan:|plan|sugerir|suggest)\s*(.*)$", re.I)
 
 def parse_command(text: str) -> tuple[str, str] | None:
     """Devuelve ('pause'|'resume'|'delete'|'exclude', argumento) o None."""
@@ -38,6 +38,8 @@ def parse_command(text: str) -> tuple[str, str] | None:
         return ("resume", "")
     if word in ("borrar", "delete"):
         return ("delete", "")
+    if word in ("sugerir", "suggest"):
+        return ("suggest", "")
     if word.startswith("plan"):
         return ("plan", arg.lstrip(":").strip()) if arg.strip(":").strip() else None
     return ("exclude", arg)

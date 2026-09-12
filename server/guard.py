@@ -27,7 +27,7 @@ def parse_llama_guard(text: str) -> dict:
 
 def _assess_llama_guard(text: str) -> dict:
     res = llm.sync_client().chat.completions.create(
-        model=config.GUARD_MODEL, messages=[{"role": "user", "content": text}], max_tokens=20, temperature=0,
+        model=llm.model_id(config.GUARD_MODEL), messages=[{"role": "user", "content": text}], max_tokens=20, temperature=0,
         extra_body=llm.provider_policy())
     return parse_llama_guard(res.choices[0].message.content)
 

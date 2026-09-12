@@ -2,7 +2,7 @@ from datetime import datetime, timezone, date, timedelta
 from fastapi import FastAPI, Request, Header, HTTPException, Response
 from pydantic import BaseModel
 from server import config, store, decide, guard, trigger_client
-from server import channels
+from server import channels, research
 from server.channels import twilio as wa
 from server.signals import health as health_signals
 from server.agent import checkin as checkin_agent
@@ -79,6 +79,8 @@ async def handle_inbound(sender: str, body: str) -> str | None:
             store.set_patient(pid, paused=0); return "Reanudado. Aquí sigo."
         if kind == "delete":
             store.delete_patient_data(pid); return "Borré tus señales, conversaciones y resúmenes. Tu plan queda."
+        if kind == "suggest":
+            return research.suggest()
         if kind == "plan":
             if not p["ref"]:
                 return "Primero dime cómo te llamas y luego me pasas tu plan."

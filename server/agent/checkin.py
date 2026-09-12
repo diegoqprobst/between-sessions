@@ -29,7 +29,7 @@ Reglas duras:
 - Cuando cierras (done=true), extraes: mood_1_5 (1 muy mal, 5 muy bien), homework_done si se habló de la tarea, note (una frase objetiva), wants_to_discuss (lo que quiere tratar en sesión, en sus palabras, o vacío).
 """
 
-_agent = Agent(name="checkin", instructions=INSTRUCTIONS, output_type=Turn, model=config.OPENAI_MODEL,
+_agent = Agent(name="checkin", instructions=INSTRUCTIONS, output_type=Turn, model=llm.model_id(),
                model_settings=llm.model_settings())
 
 def _context(patient: dict, plan: dict | None, trigger: str, today: dict | None) -> str:

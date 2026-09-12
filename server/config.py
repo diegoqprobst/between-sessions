@@ -20,6 +20,7 @@ TWILIO_AUTH_TOKEN = env("TWILIO_AUTH_TOKEN")
 TWILIO_FROM = env("TWILIO_FROM", "whatsapp:+14155238886")
 TWILIO_VALIDATE = env("TWILIO_VALIDATE", "1") == "1"
 PUBLIC_URL = env("PUBLIC_URL", "http://localhost:8000").rstrip("/")
+EXA_API_KEY = env("EXA_API_KEY", "")
 SLACK_BOT_TOKEN = env("SLACK_BOT_TOKEN", "")
 SLACK_APP_TOKEN = env("SLACK_APP_TOKEN", "")
 THERAPIST_KEY = env("THERAPIST_KEY", "dev-therapist-key")

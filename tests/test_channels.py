@@ -36,3 +36,7 @@ def test_slack_scheduled_message_opens_a_dm(monkeypatch):
     assert slack.send("slack:U123", "¿Cómo vas?") == "1.2"
     assert fake.opened_for == "U123"
     assert fake.posted_to == ("D123", "¿Cómo vas?")
+
+def test_suggest_command():
+    assert parse_command("sugerir") == ("suggest", "")
+    assert parse_command("Suggest") == ("suggest", "")

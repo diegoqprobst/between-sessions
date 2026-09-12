@@ -52,8 +52,21 @@
       </section>
       <p class="wellness-note">Bienestar general, no diagnóstico ni servicio de emergencia. Tú eliges qué conectas y qué compartes; tu empleador no ve tu información individual.</p>
       <nav class="bottom-nav" aria-label="Navegación">
-        <button class="nav-item active" type="button">Hoy</button><button class="nav-item" type="button">Recorrido</button><button class="nav-item" type="button">Control</button>
+        <button class="nav-item active" type="button">Hoy</button><button class="nav-item" type="button">Diario</button><button class="nav-item" type="button">Control</button>
       </nav>
+      <section id="journal-sheet" class="journal-sheet" hidden aria-labelledby="journal-title">
+        <header class="journal-header"><button id="close-journal" class="icon-button" type="button" aria-label="Cerrar diario">←</button><span class="date-label">ESPACIO PRIVADO</span></header>
+        <h2 id="journal-title">Tu diario</h2>
+        <p class="journal-intro">Escribe sin presión. Este borrador no se envía a tu empleador ni a tu terapeuta.</p>
+        <fieldset class="mood-picker"><legend>¿Cómo te sientes ahora?</legend><div><button type="button" data-mood="Bajo" aria-pressed="false">☁<span>Bajo</span></button><button type="button" data-mood="En calma" aria-pressed="false">◌<span>En calma</span></button><button type="button" data-mood="Con energía" aria-pressed="false">☀<span>Con energía</span></button></div></fieldset>
+        <label class="journal-label" for="journal-note">Lo que quiero recordar hoy</label>
+        <textarea id="journal-note" rows="6" placeholder="No tiene que ser perfecto. Puedes empezar por una cosa pequeña…"></textarea>
+        <label class="journal-label" for="journal-focus">Para mi próxima conversación, quiero explorar…</label>
+        <input id="journal-focus" type="text" placeholder="Opcional" />
+        <button id="save-journal" class="primary journal-save" type="button">Guardar solo para mí</button>
+        <p class="journal-footnote">Modo demo: permanece en esta pantalla y no se transmite a ningún servicio.</p>
+        <article id="journal-entry" class="journal-entry" hidden><span class="section-kicker">GUARDADO AHORA</span><strong id="entry-mood"></strong><p id="entry-note"></p></article>
+      </section>
     </main>
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
     <script src="app.js"></script>
